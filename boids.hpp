@@ -16,3 +16,4 @@ class Boids {
 
 if (d < abs(x_bi - x_bj)) {
 }
+
