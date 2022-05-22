@@ -3,6 +3,7 @@
 
 #include "doctest.h"
 
-TEST_CASE("") {
+TEST_CASE("Boid State") {
+    
 
 }
