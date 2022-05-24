@@ -1,8 +1,6 @@
 #ifndef SIMULATION_HPP
 #define SIMULATION_HPP
-#include <algorithm>
 #include <cmath>
-#include <numeric>
 #include <stdexcept>
 #include <vector>
 
@@ -11,40 +9,36 @@ struct boid {
   double vy{};
   double px{};
   double py{};
-  double const ds{};  // represent the "dimension" (radius) of each boid
-  // double Getpx() const { return px; }
-  // double Getpy() const { return py; }
+  double const ds{};
 };
-// boid operator+(boid const& a, boid const& b) {return boid{a.px + b.px, a.py + b.py};}
 
 class flock {
   std::vector<boid> flock_;
-  double d_;  // rule distance
+  double d_;
 
  public:
   flock(std::vector<boid> flock, double d) : flock_{flock}, d_{d} {}
 
   int size() const { return flock_.size(); }
   boid boid_state(int i) { return flock_[i]; }
-
-  double mass_center() {
+  struct CM {
+    double x_cm{};
+    double y_cm{};
+  };
+  CM mass_center() {
     double x_tot = 0;
     double y_tot = 0;
+    CM cm;
     auto l = size();
-    for (int i = 0; i < l; ++i) {
-      x_tot = x_tot + flock_[i].px;
-      y_tot = y_tot + flock_[i].py;
+
+    for (auto it = flock_.begin(); it != flock_.end(); ++it) {
+      x_tot += it->px;
+      y_tot += it->py;
     }
 
-    // auto x_tot = std::accumulate(flock_.begin(), flock_.end(), 0, [](int sum,
-    // const boid& f) { return sum + f.Getpx(); });
-    // auto y_tot = std::accumulate(flock_.begin(), flock_.end(), 0, [](int sum,
-    // const boid& f) { return sum + f.Getpy(); });
-
-    auto x_cm = x_tot / (l - 1);
-    auto y_cm = y_tot / (l - 1);
-    return x_cm;
-    return y_cm;
+    cm.x_cm = x_tot / (l - 1);
+    cm.y_cm = y_tot / (l - 1);
+    return cm;
   }
 
   // Rules
@@ -73,3 +67,4 @@ class flock {
 #endif
 
 // Check return multiple values (std::pair, std::tuple, struct, array)
+// Add boids (push_back)
