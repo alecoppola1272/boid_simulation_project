@@ -3,6 +3,8 @@
 #include <cmath>
 #include <stdexcept>
 #include <vector>
+constexpr double ds{10.};  // Check if
+constexpr double s = 0.5;
 
 struct boid {
   double vx{};
@@ -21,6 +23,8 @@ class flock {
 
   int size() const { return flock_.size(); }
   boid boid_state(int i) { return flock_[i]; }
+
+  // Struct that represent the mass center
   struct CM {
     double x_cm{};
     double y_cm{};
@@ -43,20 +47,34 @@ class flock {
 
   // Rules
   //  Rule 1 : Separation
-  double separation() {
-    double const s = 0.5;
-    for (int i, j; i != j; ++i, ++j) {  // "!check element position in vector!"
-      double vx_1 = 0;
-      if (std::abs(flock_[i].px - flock_[j].px) < flock_[1].ds) {
-        vx_1 = -s * (flock_[j].px - flock_[i].px);
+  // struct that represent separation velocity
+  struct separation_v {
+    double vx_1;
+    double vy_1;
+  };
+  separation_v separation() {
+    separation_v v1;
+    double sum_vx1 = 0;
+    double sum_vy1 = 0;
+
+    auto it = flock_.begin();
+    auto it_next = std::next(it);
+    auto it_last = std::prev(flock_.end());
+
+    //  ! Add external "for"
+    for (; it != it_last; ++it, ++it_next) {
+      if (std::abs(it->py - it_next->py) < ds) {
+        sum_vy1 += std::abs(it->vy - it_next->vy);
       }
-      return vx_1;
-      double vy_1 = 0;
-      if (std::abs(flock_[i].py - flock_[j].py) < flock_[1].ds) {
-        vx_1 = -s * (flock_[j].py - flock_[i].py);
+      if (std::abs(it->px - it_next->px) < ds) {
+        sum_vx1 += std::abs(it->vx - it_next->vx);
       }
-      return vy_1;
     }
+
+    v1.vx_1 = -s * sum_vx1;
+    v1.vy_1 = -s * sum_vy1;
+
+    return v1;
   }
   // Rule 2: Aligment
   double aligment() {}
@@ -66,5 +84,5 @@ class flock {
 
 #endif
 
-// Check return multiple values (std::pair, std::tuple, struct, array)
-// Add boids (push_back)
+// Check return multiple values (struct, array)
+// Add boids ? (push_back)
