@@ -2,29 +2,31 @@
 #define SIMULATION_HPP
 
 #include <cmath>
+#include <iostream>
 #include <stdexcept>
 #include <vector>
 
-constexpr double ds{10.};  // Check if
-constexpr double s = 0.5;
-constexpr double coesion_factor = 1;
+#include "main.cpp"
+
+constexpr double distance_s{10.};  // Check if
+double separation_factor;
+double alignment_factor;
+double coesion_factor;
 
 struct boid {
   double vx{};
   double vy{};
   double px{};
   double py{};
-  // double const ds{};
 };
 
 class flock {
   std::vector<boid> flock_;
-  double d_;
 
  public:
-  flock(std::vector<boid> flock, double d) : flock_{flock}, d_{d} {}
+  flock(std::vector<boid> flock) : flock_{flock} {}  // variabile d?
 
-  int size() const { return flock_.size(); }  // ! check it
+  int size() const { return flock_.size(); }
   boid boid_state(int i) { return flock_[i]; }
 
   // Struct that represent the mass center
@@ -34,9 +36,9 @@ class flock {
   };
 
   CM mass_center() {
+    CM cm;
     double x_tot = 0;
     double y_tot = 0;
-    CM cm;
     auto l = size();
 
     for (auto it = flock_.begin(); it != flock_.end(); ++it) {
@@ -51,7 +53,7 @@ class flock {
 
   // Rules
 
-  //  Rule 1 : Separation
+  // Rule 1 : Separation
   // struct that represent separation velocity
   struct separation_v {
     double vx_1;
@@ -69,22 +71,43 @@ class flock {
 
     //  ! Add external "for"
     for (; it != it_last; ++it, ++it_next) {
-      if (std::abs(it->py - it_next->py) < ds) {
+      if (std::abs(it->py - it_next->py) < distance_s) {
         sum_vy1 += std::abs(it->vy - it_next->vy);
       }
-      if (std::abs(it->px - it_next->px) < ds) {
+      if (std::abs(it->px - it_next->px) < distance_s) {
         sum_vx1 += std::abs(it->vx - it_next->vx);
       }
     }
 
-    v1.vx_1 = -s * sum_vx1;
-    v1.vy_1 = -s * sum_vy1;
+    v1.vx_1 = -separation_factor * sum_vx1;
+    v1.vy_1 = -separation_factor * sum_vy1;
 
     return v1;
   }
 
-  // Rule 2: Aligment
-  double aligment() {}
+  // Rule 2: Alignment
+  struct alignment_v {
+    double vx_2;
+    double vy_2;
+  };
+
+  alignment_v alignment() {
+    alignment_v v2;
+    double sum_vx2 = 0;
+    double sum_vy2 = 0;
+    auto l = size();
+    int j;
+
+    for (auto it = flock_.begin(); it != flock_.end(); ++it) {
+      sum_vx2 += it->px;
+      sum_vy2 += it->py;
+    }
+
+    v2.vx_2 = alignment_factor * (sum_vx2 - flock_[j].px) * (l - 1);
+    v2.vy_2 = alignment_factor * (sum_vy2 - flock_[j].py) * (l - 1);
+
+    return v2;
+  }
 
   // Rule 3 : Coesion
   struct coesion_v {
@@ -102,6 +125,8 @@ class flock {
 
     return v3;
   }
+
+  std::vector<flock> birds(n_boid);
 };
 
 #endif
