@@ -3,10 +3,9 @@
 
 #include <cmath>
 #include <iostream>
-#include <stdexcept>
 #include <vector>
 
-constexpr double distance_s{10.};  // Check if
+constexpr double distance_s{10.};
 double separation_factor;
 double alignment_factor;
 double coesion_factor;
@@ -28,7 +27,7 @@ class Flock {
   int size() const { return flock_.size(); }
   boid boid_state(int i) { return flock_[i]; }
 
-  // Struct that represent the mass center
+  // Struct for mass center
   struct CM {
     double x_cm{};
     double y_cm{};
@@ -129,3 +128,4 @@ class Flock {
 #endif
 
 // Check return multiple values (struct, array)
+// Variabili boid in due array: v(x,y) e p(x,y)

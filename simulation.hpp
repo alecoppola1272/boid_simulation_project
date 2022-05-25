@@ -1,5 +1,6 @@
 #include "flock.hpp"
 
+int creation_birds() {
   int n_boids;
   std::cout << "Separation factor: ";
   std::cin >> separation_factor;
@@ -9,7 +10,7 @@
   std::cin >> coesion_factor;
   std::cout << "Number of boids: ";
   std::cin >> n_boids;
-  // controllare regole di input
+  // aggiungere regole di input
 
   std::vector<Flock> birds(n_boids);
 
@@ -18,5 +19,9 @@
   auto it_last = std::prev(birds.end());
 
   for (; it != it_last; ++it, ++it_next) {
+    birds.vx = std::rand() % 10;
+    birds.vy = std::rand() % 10;
     birds.px = std::rand() % 100;
+    birds.py = std::rand() % 100;
   }
+}
