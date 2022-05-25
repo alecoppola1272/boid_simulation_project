@@ -13,6 +13,7 @@ TEST_CASE("Mass Center") {
     CHECK(cm.x_cm == (5.));
     CHECK(cm.y_cm == (8.));
   }
+  
   SUBCASE("Three Boids") {
     boid b1{0., 0., 2., 3., .5};
     boid b2{0., 0., 3., 5., .5};
@@ -24,15 +25,13 @@ TEST_CASE("Mass Center") {
   }
 }
 
-TEST_CASE("Separation Rule"){
-     SUBCASE("Two Boids") {
+TEST_CASE("Separation Rule") {
+  SUBCASE("Two Boids") {
     boid b1{2., 3., 2., 3., .5};
     boid b2{1., 2., 3., 5., .5};
     flock f{{b1, b2}, 3.};
     flock::separation_v v1 = f.separation();
-    CHECK(v1.vx_1==(-0.5));
-    CHECK(v1.vy_1==(-1.));
-
-
+    CHECK(v1.vx_1 == (-0.5));
+    CHECK(v1.vy_1 == (-1.));
   }
 }
