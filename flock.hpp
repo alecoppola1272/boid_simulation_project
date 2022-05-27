@@ -33,26 +33,24 @@ class Flock {
     double y_cm{};
   };
 
-  CM mass_center() {
+  CM mass_center(int size) {
     CM cm;
-    double x_tot = 0;
-    double y_tot = 0;
-    auto l = size();
+    double x_tot{};
+    double y_tot{};
 
     for (auto it = flock_.begin(); it != flock_.end(); ++it) {
       x_tot += it->px;
       y_tot += it->py;
     }
 
-    cm.x_cm = x_tot / (l - 1);
-    cm.y_cm = y_tot / (l - 1);
+    cm.x_cm = x_tot / (size - 1);
+    cm.y_cm = y_tot / (size - 1);
     return cm;
   }
 
   // Rules
 
   // Rule 1 : Separation
-  // struct that represent separation velocity
   struct separation_v {
     double vx_1;
     double vy_1;
@@ -60,20 +58,19 @@ class Flock {
 
   separation_v separation() {
     separation_v v1;
-    double sum_vx1 = 0;
-    double sum_vy1 = 0;
+    double sum_vx1{};
+    double sum_vy1{};
 
-    auto it = flock_.begin();
-    auto it_next = std::next(it);
     auto it_last = std::prev(flock_.end());
 
-    //  ! Add external "for"
-    for (; it != it_last; ++it, ++it_next) {
-      if (std::abs(it->py - it_next->py) < distance_s) {
-        sum_vy1 += std::abs(it->vy - it_next->vy);
-      }
-      if (std::abs(it->px - it_next->px) < distance_s) {
-        sum_vx1 += std::abs(it->vx - it_next->vx);
+    for (auto it2 = flock_.begin(); it2 != it_last; ++it2) {
+      for (auto it1 = flock_.begin(); it1 != it_last; ++it1) {
+        if (std::abs(it1->py - it2->py) < distance_s) {
+          sum_vy1 += std::abs(it1->vy - it2->vy);
+        }
+        if (std::abs(it1->px - it2->px) < distance_s) {
+          sum_vx1 += std::abs(it1->vx - it2->vx);
+        }
       }
     }
 
@@ -89,20 +86,19 @@ class Flock {
     double vy_2;
   };
 
-  alignment_v alignment() {
+  alignment_v alignment(int size, int* j) {
     alignment_v v2;
-    double sum_vx2 = 0;
-    double sum_vy2 = 0;
-    auto l = size();
-    int j;
+    double sum_vx2{};
+    double sum_vy2{};
 
-    for (auto it = flock_.begin(); it != flock_.end(); ++it) {
+    auto it = flock_.begin();
+    for (; it != flock_.end(); ++it) {
       sum_vx2 += it->px;
       sum_vy2 += it->py;
     }
 
-    v2.vx_2 = alignment_factor * (sum_vx2 - flock_[j].px) * (l - 1);
-    v2.vy_2 = alignment_factor * (sum_vy2 - flock_[j].py) * (l - 1);
+    v2.vx_2 = alignment_factor * (sum_vx2 - j->vx) * (size - 1);
+    v2.vy_2 = alignment_factor * (sum_vy2 - j->vy) * (size - 1);
 
     return v2;
   }
@@ -113,36 +109,39 @@ class Flock {
     double vy_3;
   };
 
-  coesion_v coesion() {
+  coesion_v coesion(int j, int size) {
     coesion_v v3;
-    CM p_cm = mass_center();
-    int j;
+    CM cm = mass_center(size);
+    auto it = flock_.begin();
 
-    v3.vx_3 = coesion_factor * (p_cm.x_cm - flock_[j].px);
-    v3.vy_3 = coesion_factor * (p_cm.y_cm - flock_[j].py);
+    v3.vx_3 = coesion_factor * (cm.x_cm - it->px);
+    v3.vy_3 = coesion_factor * (cm.y_cm - it->py);
 
     return v3;
   }
 
-  // Comportamento ai bordi
+  // Behavior edges
   struct border_v {
     double vx_b;
     double vy_b;
   };
 
   border_v borders() {
+    border_v vb;
     auto it = flock_.begin();
     auto it_next = std::next(it);
     auto it_last = std::prev(flock_.end());
 
     for (; it != it_last; ++it, ++it_next) {
       if ((it->px < 10 && it->vx < 0) || (it->px > 90 && it->vx > 0)) {
-        it->vx = it->vx - it->vx * (10 - it->px) * 0, 1;
+        it->vx -= it->vx * (10 - it->px) * 0, 1;
       }
       if ((it->py < 10 && it->vy < 0) || (it->py > 90 && it->vy > 0)) {
-        it->vy = it->vy - it->vy * (10 - it->py) * 0, 1;
+        it->vy -= it->vy * (10 - it->py) * 0, 1;
       }
     }
+
+    return vb;
   }
 };
 
@@ -150,4 +149,3 @@ class Flock {
 
 // Check return multiple values (struct, array)
 // Variabili boid in due array: v(x,y) e p(x,y)
-// creazione fx che somma v delle regole a v generale
