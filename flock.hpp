@@ -123,9 +123,31 @@ class Flock {
 
     return v3;
   }
+
+  // Comportamento ai bordi
+  struct border_v {
+    double vx_b;
+    double vy_b;
+  };
+
+  border_v borders() {
+    auto it = flock_.begin();
+    auto it_next = std::next(it);
+    auto it_last = std::prev(flock_.end());
+
+    for (; it != it_last; ++it, ++it_next) {
+      if ((it->px < 10 && it->vx < 0) || (it->px > 90 && it->vx > 0)) {
+        it->vx = it->vx - it->vx * (10 - it->px) * 0, 1;
+      }
+      if ((it->py < 10 && it->vy < 0) || (it->py > 90 && it->vy > 0)) {
+        it->vy = it->vy - it->vy * (10 - it->py) * 0, 1;
+      }
+    }
+  }
 };
 
 #endif
 
 // Check return multiple values (struct, array)
 // Variabili boid in due array: v(x,y) e p(x,y)
+// creazione fx che somma v delle regole a v generale
