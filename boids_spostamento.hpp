@@ -16,38 +16,15 @@ struct boid {
   double py{};
 };
 
-class Flock {
-  std::vector<boid> flock_;
+class Boid {
+  std::vector<boid> boid_;
   double d_;
 
  public:
-  Flock(std::vector<boid> flock, double d) : flock_{flock}, d_{d} {}
+  Boid(std::vector<boid> boid, double d) : boid_{boid}, d_{d} {}
 
-  int size() const { return flock_.size(); }
-  boid boid_state(int i) { return flock_[i]; }
-
-  // Struct for mass center
-  struct CM {
-    double x_cm{};
-    double y_cm{};
-  };
-
-  CM mass_center(int size) {
-    CM cm;
-    double x_tot{};
-    double y_tot{};
-
-    for (auto it = flock_.begin(); it != flock_.end(); ++it) {
-      x_tot += it->px;
-      y_tot += it->py;
-    }
-
-    cm.x_cm = x_tot / (size - 1);
-    cm.y_cm = y_tot / (size - 1);
-    return cm;
-  }
-
-  // Rules
+  int size() const { return boid_.size(); }
+  boid boid_state(int i) { return boid_[i]; }
 
   // Rule 1 : Separation
   struct separation_v {
@@ -60,10 +37,10 @@ class Flock {
     double sum_vx1{};
     double sum_vy1{};
 
-    auto it_last = std::prev(flock_.end());
+    auto it_last = std::prev(boid_.end());
 
-    for (auto it2 = flock_.begin(); it2 != it_last; ++it2) {
-      for (auto it1 = flock_.begin(); it1 != it_last; ++it1) {
+    for (auto it2 = boid_.begin(); it2 != it_last; ++it2) {
+      for (auto it1 = boid_.begin(); it1 != it_last; ++it1) {
         if (std::abs(it1->py - it2->py) < distance_s) {
           sum_vy1 += std::abs(it1->vy - it2->vy);
         }
@@ -90,8 +67,8 @@ class Flock {
     double sum_vx2{};
     double sum_vy2{};
 
-    auto it = flock_.begin();
-    for (; it != flock_.end(); ++it) {
+    auto it = boid_.begin();
+    for (; it != boid_.end(); ++it) {
       sum_vx2 += it->px;
       sum_vy2 += it->py;
     }
@@ -111,7 +88,7 @@ class Flock {
   coesion_v coesion(int j, int size) {
     coesion_v v3;
     CM cm = mass_center(size);
-    auto it = flock_.begin();
+    auto it = boid_.begin();
 
     v3.vx_3 = coesion_factor * (cm.x_cm - it->px);
     v3.vy_3 = coesion_factor * (cm.y_cm - it->py);
@@ -127,9 +104,9 @@ class Flock {
 
   border_v borders() {
     border_v vb;
-    auto it = flock_.begin();
+    auto it = boid_.begin();
     auto it_next = std::next(it);
-    auto it_last = std::prev(flock_.end());
+    auto it_last = std::prev(boid_.end());
 
     for (; it != it_last; ++it, ++it_next) {
       if ((it->px < 10 && it->vx < 0) || (it->px > 90 && it->vx > 0)) {
