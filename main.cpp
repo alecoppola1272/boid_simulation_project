@@ -1,4 +1,5 @@
-#include "flock.hpp"
+#include "boids.hpp"
+#include "evolve.hpp"
 
 int main() {
   int n_boids;

@@ -1,4 +1,6 @@
-#include "flock.hpp"
+#include <iostream>
+
+#include "boids.hpp"
 
 constexpr double distance_max;
 
@@ -14,5 +16,6 @@ void creation_b(double x) {
     it->py = std::rand() % 100;
   }
 
-  for (auto it = birds.begin(); it != it_last; ++it) {}
+  for (auto it = birds.begin(); it != it_last; ++it) {
+  }
 }
