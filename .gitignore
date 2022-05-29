@@ -1,2 +1,4 @@
 a.out
 prova.cpp
+.clang-format
+SFML-2.5.1
