@@ -1,5 +1,6 @@
-#include "boids_spostamento.hpp"
 #include <vector>
+
+#include "boids_spostamento.hpp"
 
 class Flock {
   std::vector<boid> flock_;
@@ -31,4 +32,5 @@ class Flock {
     cm.y_cm = y_tot / (size - 1);
     return cm;
   }
+
 };

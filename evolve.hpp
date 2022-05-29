@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include "boids.hpp"
 
 constexpr double distance_max;

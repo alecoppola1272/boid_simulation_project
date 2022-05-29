@@ -1,6 +1,8 @@
 #include "boids.hpp"
 #include "evolve.hpp"
 
+#include <iostream>
+
 int main() {
   int n_boids;
 
