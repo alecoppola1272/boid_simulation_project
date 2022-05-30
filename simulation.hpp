@@ -14,7 +14,6 @@ auto creation_flock(int n_boids) {
 auto evolve_flock() {
   // controllo dei vicini
   // sommare velocità a boid generati
-  // limite velocità massima
 }
 
 auto simulation(double duration, int fps) {
