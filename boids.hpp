@@ -7,6 +7,7 @@
 #include <vector>
 
 constexpr int spatial_dimension{2};
+constexpr double velocity_default{10.};
 constexpr double velocity_max{20.};
 constexpr double distance_separation{5.};
 double separation_factor;
@@ -17,6 +18,7 @@ struct coordinates {
   std::array<double, spatial_dimension> position;
   std::array<double, spatial_dimension> velocity;
 };
+// creare funzione get(x,y)
 
 class Boid {
   coordinates boid;
@@ -55,7 +57,7 @@ class Boid {
     coordinates v2;
     coordinates v2_sum{0., 0.};
 
-    for (auto it = Flock::Flock.begin(); it != Flock::Flock.end(); ++it) {
+    for (auto it = Flock::flock.begin(); it != Flock::Flock.end(); ++it) {
       v2.velocity += it->position;
     }
 
@@ -86,8 +88,8 @@ class Boid {
     coordinates edge;
 
     for (int i = 0; i != spatial_dimension; i++) {
-      if ((boid.position[i] < 10 && boid.velocity[i] < 10) ||
-          (boid.position[i] > 90 && boid.velocity[i] > -10)) {
+      if ((boid.position[i] < 10 && boid.velocity[i] < velocity_default) ||
+          (boid.position[i] > 90 && boid.velocity[i] > -velocity_default)) {
         edge.velocity[i] -= boid.velocity[i] * (10 - boid.position[i]) * 0.1;
       } else {
         edge.velocity[i] = 0;
@@ -122,10 +124,9 @@ class Boid {
 
 class Flock {
   std::vector<Boid> flock;
-  // da vettore ad array?
 
  public:
-  Flock(std::vector<Boid> flock_) : flock{flock_} {}
+  Flock(Flock flock_) : flock{flock_} {}
 
   auto center_mass(int n_boids) {
     coordinates cm;
