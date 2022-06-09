@@ -1,8 +1,8 @@
-#include "simulation.hpp"
-
 #include <iostream>
 
-int main() {
+#include "simulation.hpp"
+
+int main(Flock flock) {  // costruttore di flock da sistemare
   int n_boids;
   double const duration_second{20.0};
   int const fps{30};
@@ -15,11 +15,14 @@ int main() {
   std::cin >> alignment_factor;
   std::cout << "Coesion factor: ";
   std::cin >> coesion_factor;
-  // input rule
 
-  std::cout << "Distance of separation (preset): " << distance_separation
-            << "\nSpatial dimension (preset): " << spatial_dimension
-            << "\nSimulation duration (preset): " << duration_second << "\n";
+  if (alignment_factor > 1) {
+    std::cout << "Error input";
+  } else {
+    std::cout << "Distance of separation (preset): " << distance_separation
+              << "\nSpatial dimension (preset): " << spatial_dimension
+              << "\nSimulation duration (preset): " << duration_second << "\n";
 
-  simulation(duration_second, fps);
+    simulation(duration_second, fps, n_boids, flock);
+  }
 }
