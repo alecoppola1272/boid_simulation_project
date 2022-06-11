@@ -11,6 +11,7 @@ constexpr int box_length{100};
 constexpr int edge_lenght{10};
 constexpr double velocity_default{10.};
 constexpr double velocity_max{20.};
+constexpr double distance_neighbors{5.};
 constexpr double distance_separation{5.};
 constexpr double edge_factor{0.1};
 double separation_factor;
