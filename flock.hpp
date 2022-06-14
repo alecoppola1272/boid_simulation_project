@@ -16,7 +16,8 @@ class Flock {
     coordinates new_boid;
     for (int j = 0; j != n_boids; ++j) {
       for (int i = 0; i != spatial_dimension; ++i) {
-        new_boid.velocity[i] = std::rand() % 1, velocity_default;
+        new_boid.velocity[i] = std::rand() % 1,
+        velocity_default;  // std::uniform_real_distribution
         new_boid.position[i] = std::rand() % 1, box_length - 1;
       }
       flock.push_back(new_boid);
@@ -29,9 +30,7 @@ class Flock {
     coordinates sum;
     sum.position = {0., 0.};
 
-    for (auto i = flock.begin(); i != flock.end(); i++) {
-      std::accumulate(sum.position, i->position, 0);
-    }
+    sum.position = std::accumulate(flock.begin(), flock.end(), Position{0.,0.}, [](...){return ...;});
 
     for (int i = 0; i != spatial_dimension; i++) {
       cm.position[i] = sum.position[i] / (n_boids - 1);

@@ -75,8 +75,8 @@ auto edge_velocity() {
   return edge.velocity;
 }
 
-// sum of velocity
-auto velocity_sum(Flock flock, auto it) {
+// update velocity
+auto update_velocity(Flock flock, auto it) {
   coordinates v_sum;
   auto v1 = serparation_velocity(flock);
   auto v2 = alignment_velocity();

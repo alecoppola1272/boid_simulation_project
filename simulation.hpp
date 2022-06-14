@@ -5,10 +5,10 @@
 #include "velocity_rules.hpp"
 
 auto evolve_flock(int fps, int n_boids) {
-  Flock flock{{}};
+  Flock flock{{}};  // in simulation
 
   flock.add_boids(n_boids);
-  std::vector<int> controllo_vicini;
+  std::vector<std::vector<coordinates>::iterator> controllo_vicini;
   auto it_last = std::prev(flock.fend());
 
   // checking neighbors
@@ -23,7 +23,7 @@ auto evolve_flock(int fps, int n_boids) {
         }
       }
     }
-    // velocity_sum();
+    update_velocity(flock, it1);
   }
 
   for (auto it = flock.fbegin(); it != it_last; ++it) {
