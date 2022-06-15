@@ -1,108 +1,108 @@
 #ifndef VELOCITY_RULES_HPP
 #define VELOCITY_RULES_HPP
 
-// rule 1: Separation
-auto serparation_velocity(Flock flock, values value) {
-  coordinates v1;
-  coordinates v1_sum{0., 0.};
+auto serparation_velocity(Flock flock, double separation_factor) {
+  velocity v1;
+  velocity v1_sum{0., 0.};
 
-  auto it_last = std::prev(flock.fend());
-  for (auto it1 = flock.fbegin(); it1 != it_last; ++it1) {
-    for (auto it2 = flock.fbegin(); it2 != it_last; ++it2) {
-      if (std::abs(it2->px - it1->px) < distance_separation) {
-        v1_sum.vx += std::abs(it2->vx - it1->vx);
+  auto it_last = std::prev(flock.end());
+  for (auto it1 = flock.begin(); it1 != it_last; ++it1) {
+    for (auto it2 = flock.begin(); it2 != it_last; ++it2) {
+      if (std::abs(it2->p.x - it1->p.x) < distance_separation) {
+        v1_sum.x += std::abs(it2->v.x - it1->v.x);
       }
-      if (std::abs(it2->py - it1->py) < distance_separation) {
-        v1_sum.vy += std::abs(it2->vy - it1->vy);
+      if (std::abs(it2->p.y - it1->p.y) < distance_separation) {
+        v1_sum.y += std::abs(it2->v.y - it1->v.y);
       }
     }
   }
 
-  v1.vx = -value.separation_factor * v1_sum.vx;
-  v1.vy = -value.separation_factor * v1_sum.vy;
+  v1.x = -separation_factor * v1_sum.x;
+  v1.y = -separation_factor * v1_sum.y;
 
   return v1;
 }
 
-// rule 2: Alignment
-auto alignment_velocity(int n_boids, auto it, Flock flock, values value) {
-  coordinates v2;
-  coordinates v2_sum{0., 0.};
+auto alignment_velocity(int n_boids, auto it, Flock flock,
+                        double alignment_factor) {
+  velocity v2;
+  velocity v2_sum{0., 0.};
 
-  auto it_last = std::prev(flock.fend());
-  for (auto it = flock.fbegin(); it != it_last; ++it) {
-    v2.vx += it->px;
-    v2.vx += it->px;
+  auto it_last = std::prev(flock.end());
+  for (auto it = flock.begin(); it != it_last; ++it) {
+    v2.x += it->p.x;
+    v2.x += it->p.x;
   }
 
-  v2.vx = value.alignment_factor * (v2_sum.vx - it->vx) * (n_boids - 1);
-  v2.vy = value.alignment_factor * (v2_sum.vy - it->vy) * (n_boids - 1);
+  v2.x = alignment_factor * (v2_sum.x - it->v.x) * (n_boids - 1);
+  v2.y = alignment_factor * (v2_sum.y - it->v.y) * (n_boids - 1);
 
   return v2;
 }
 
-// rule 3: Coesion
-auto coesion_velocity(int n_boids, Flock flock, values value) {
-  coordinates v3;
+auto coesion_velocity(int n_boids, Flock flock, double coesion_factor) {
+  velocity v3;
   auto cm = flock.center_mass(n_boids);
-  auto it = flock.fbegin();
+  auto it = flock.begin();
 
-  v3.vx = value.coesion_factor * (cm.px - it->px);
-  v3.vy = value.coesion_factor * (cm.py - it->py);
+  v3.x = coesion_factor * (cm.x - it->p.x);
+  v3.y = coesion_factor * (cm.y - it->p.y);
   // prendere flock[it].position
 
   return v3;
 }
 
-// behavior edges
-auto edge_velocity() {
-  coordinates edge;
+auto edge_velocity(Flock flock, auto it) {
+  velocity edge;
 
-  if ((flock.px < edge_lenght && flock.vx < velocity_default) ||
-      (flock.px > (box_length - edge_lenght) && flock.vx > -velocity_default)) {
-    edge.vx -= flock.vx * (edge_lenght - flock.px) * edge_factor;
+  auto it = flock.begin();
+  auto it_last = std::prev(flock.end());
+
+  if ((it->p.x < edge_lenght && it->v.x < velocity_default) ||
+      (it->p.x > (box_length - edge_lenght) && it->v.x > -velocity_default)) {
+    edge.x -= it->v.x * (edge_lenght - it->p.x) * edge_factor;
   } else {
-    edge.vx = 0;
+    edge.x = 0;
   }
-  if ((flock.py < edge_lenght && flock.vy < velocity_default) ||
-      (flock.py > (box_length - edge_lenght) && flock.vy > -velocity_default)) {
-    edge.vy -= flock.vy * (edge_lenght - flock.py) * edge_factor;
+  if ((it->p.y < edge_lenght && it->v.y < velocity_default) ||
+      (it->p.y > (box_length - edge_lenght) && it->v.y > -velocity_default)) {
+    edge.y -= it->v.y * (edge_lenght - it->p.y) * edge_factor;
   } else {
-    edge.vy = 0;
+    edge.y = 0;
   }
 
   return edge;
 }
 
-// update velocity
-auto update_velocity(Flock flock, auto it, values value, int n_boids) {
-  coordinates v_sum;
-  auto v1 = serparation_velocity(flock, value);
-  auto v2 = alignment_velocity(n_boids, it, flock, value);
-  auto v3 = coesion_velocity(n_boids, flock, value);
-  auto v4 = edge_velocity();
-
-  v_sum.vx = 0;
-  v_sum.vx += v1.vx + v2.vx + v3.vx + v4.vx + it->vx;
-
-  v_sum.vy = 0;
-  v_sum.vy += v1.vy + v2.vy + v3.vy + v4.vy + it->vy;
-
-  // velocity limit
-  if ((std::abs(v_sum.vx) > velocity_max)) {
-    if (v_sum.vx > 0) {
-      v_sum.vx = velocity_max;
+auto velocity_limit(velocity v_sum) {
+  if ((std::abs(v_sum.x) > velocity_max)) {
+    if (v_sum.x > 0) {
+      v_sum.x = velocity_max;
     } else {
-      v_sum.vx = -velocity_max;
+      v_sum.x = -velocity_max;
     }
   }
-  if ((std::abs(v_sum.vy) > velocity_max)) {
-    if (v_sum.vy > 0) {
-      v_sum.vy = velocity_max;
+
+  if ((std::abs(v_sum.y) > velocity_max)) {
+    if (v_sum.y > 0) {
+      v_sum.y = velocity_max;
     } else {
-      v_sum.vy = -velocity_max;
+      v_sum.y = -velocity_max;
     }
   }
+
+  return v_sum;
+}
+
+auto velocity_sum(velocity v_sum, Flock flock, auto it, values value,
+                  int n_boids, auto controllo_vicini) {
+  auto v1 = serparation_velocity(flock, value.separation_factor);
+  auto v2 = alignment_velocity(n_boids, it, flock, value.alignment_factor);
+  auto v3 = coesion_velocity(n_boids, flock, value.coesion_factor);
+  auto v4 = edge_velocity(flock, it);
+
+  v_sum.x += v1.x + v2.x + v3.x + v4.x + it->v.x;
+  v_sum.y += v1.y + v2.y + v3.y + v4.y + it->v.y;
 
   return v_sum;
 }

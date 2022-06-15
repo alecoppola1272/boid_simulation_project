@@ -1,6 +1,3 @@
-#ifndef MAIN_CPP
-#define MAIN_CPP
-
 #include <array>
 #include <cmath>
 #include <iostream>
@@ -48,5 +45,3 @@ int main() {
     simulation(duration_second, fps, value.n_boids, value);
   }
 }
-
-#endif
