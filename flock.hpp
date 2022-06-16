@@ -22,13 +22,13 @@ class Flock {
  public:
   Flock(std::vector<coordinates> flock_) : flock{flock_} {}
 
-  auto add_boids(int n_boids) {
+  auto add_boids(values val) {
     coordinates new_boid;
 
-    std::uniform_real_distribution<> v_rand(1., velocity_default);
-    std::uniform_real_distribution<> p_rand(1., box_length - 1);
+    std::uniform_real_distribution<> v_rand(1., val.velocity_default);
+    std::uniform_real_distribution<> p_rand(1., val.box_length - 1);
 
-    for (int j = 0; j != n_boids; ++j) {
+    for (int j = 0; j != val.n_boids; ++j) {
       // new_boid.v.x = v_rand;
       // new_boid.v.y = v_rand;
 

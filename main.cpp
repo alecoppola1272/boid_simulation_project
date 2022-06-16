@@ -7,19 +7,18 @@
 
 #include "simulation.hpp"
 
-constexpr int box_length{100};
-constexpr int edge_lenght{10};
-constexpr double velocity_default{10.};
-constexpr double velocity_max{20.};
-constexpr double distance_neighbors{5.};
-constexpr double distance_separation{5.};
-constexpr double edge_factor{0.1};
-
 struct values {
   int n_boids;
   double separation_factor;
   double alignment_factor;
   double coesion_factor;
+  
+  int const box_length{100};
+  int const edge_lenght{10};
+  double const velocity_default{10.};
+  double const velocity_max{20.};
+  double const distance_separation{5.};
+  double const edge_factor{0.1};
 };
 
 int main() {
@@ -39,9 +38,9 @@ int main() {
   if (val.alignment_factor > 1) {
     std::cout << "Error input";  // runtime_ERROR (throw)
   } else {
-    std::cout << "Distance of separation (preset): " << distance_separation
+    std::cout << "Distance of separation (preset): " << val.distance_separation
               << "\nSimulation duration (preset): " << duration_second << "\n";
 
-    simulation(duration_second, fps, val.n_boids, val);
+    simulation(duration_second, fps, val);
   }
 }
