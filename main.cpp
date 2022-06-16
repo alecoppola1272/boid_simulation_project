@@ -23,25 +23,25 @@ struct values {
 };
 
 int main() {
-  values value;
+  values val;
   double const duration_second{20.0};
   int const fps{30};
 
   std::cout << "Number of boids: ";
-  std::cin >> value.n_boids;
+  std::cin >> val.n_boids;
   std::cout << "Separation factor: ";
-  std::cin >> value.separation_factor;
+  std::cin >> val.separation_factor;
   std::cout << "Alignment factor (a < 1): ";
-  std::cin >> value.alignment_factor;
+  std::cin >> val.alignment_factor;
   std::cout << "Coesion factor: ";
-  std::cin >> value.coesion_factor;
+  std::cin >> val.coesion_factor;
 
-  if (value.alignment_factor > 1) {
+  if (val.alignment_factor > 1) {
     std::cout << "Error input";  // runtime_ERROR (throw)
   } else {
     std::cout << "Distance of separation (preset): " << distance_separation
               << "\nSimulation duration (preset): " << duration_second << "\n";
 
-    simulation(duration_second, fps, value.n_boids, value);
+    simulation(duration_second, fps, val.n_boids, val);
   }
 }
