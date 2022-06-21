@@ -25,15 +25,17 @@ class Flock {
   auto add_boids(values val) {
     coordinates new_boid;
 
+    std::random_device rd;
+    std::mt19937 gen(rd());
     std::uniform_real_distribution<> v_rand(1., val.velocity_default);
     std::uniform_real_distribution<> p_rand(1., val.box_length - 1);
 
     for (int j = 0; j != val.n_boids; ++j) {
-      // new_boid.v.x = v_rand;
-      // new_boid.v.y = v_rand;
+      new_boid.v.x = v_rand(gen);
+      new_boid.v.y = v_rand(gen);
 
-      // new_boid.p.x = p_rand;
-      // new_boid.p.y = p_rand;
+      new_boid.p.x = p_rand(gen);
+      new_boid.p.y = p_rand(gen);
 
       flock.push_back(new_boid);
     }
@@ -46,8 +48,13 @@ class Flock {
     sum.x = 0;
     sum.y = 0;
 
-    // sum = std::accumulate(flock.begin(), flock.end(), 
-    // Position{0.,0.},[](...) { return ...; });
+    sum = std::accumulate(flock.begin(), flock.end(), sum,
+                          [](position first, position second) {
+                            position result;
+                            result.x = first.x + second.x;
+                            result.y = first.y + second.y;
+                            return result;
+                          });
 
     cm.x = sum.x / (n_boids - 1);
     cm.y = sum.y / (n_boids - 1);
