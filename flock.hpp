@@ -17,12 +17,12 @@ struct coordinates {
 };
 
 class Flock {
-  std::vector<coordinates> flock;
+  std::vector<coordinates> flock_;
 
  public:
-  Flock(std::vector<coordinates> flock_) : flock{flock_} {}
+  Flock(std::vector<coordinates> flock) : flock_{flock} {}
 
-  auto add_boids(values val) {
+  auto add_boids(values const& val) {
     coordinates new_boid;
 
     std::random_device rd;
@@ -37,9 +37,9 @@ class Flock {
       new_boid.p.x = p_rand(gen);
       new_boid.p.y = p_rand(gen);
 
-      flock.push_back(new_boid);
+      flock_.push_back(new_boid);
     }
-    return flock;
+    return flock_;
   }
 
   auto center_mass(int n_boids) {
@@ -48,11 +48,11 @@ class Flock {
     sum.x = 0;
     sum.y = 0;
 
-    sum = std::accumulate(flock.begin(), flock.end(), sum,
-                          [](position first, position second) {
+    sum = std::accumulate(flock_.begin(), flock_.end(), sum,
+                          [](coordinates first, coordinates second) {
                             position result;
-                            result.x = first.x + second.x;
-                            result.y = first.y + second.y;
+                            result.x = first.p.x + second.p.x;
+                            result.y = first.p.y + second.p.y;
                             return result;
                           });
 
@@ -62,8 +62,8 @@ class Flock {
     return cm;
   }
 
-  auto begin() { return flock.begin(); }
-  auto end() { return flock.end(); }
+  auto begin() { return flock_.begin(); }
+  auto end() { return flock_.end(); }
 };
 
 #endif

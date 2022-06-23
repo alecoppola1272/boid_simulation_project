@@ -5,6 +5,9 @@
 #include <random>
 #include <vector>
 
+#include <stdexcept>
+#include <cassert>
+
 #include "simulation.hpp"
 
 struct values {
@@ -12,7 +15,7 @@ struct values {
   double separation_factor;
   double alignment_factor;
   double coesion_factor;
-  
+
   int const box_length{100};
   int const edge_lenght{10};
   double const velocity_default{10.};
@@ -36,7 +39,7 @@ int main() {
   std::cin >> val.coesion_factor;
 
   if (val.alignment_factor > 1) {
-    std::cout << "Error input";  // runtime_ERROR (throw)
+    throw std::runtime_error{"Error input"};
   } else {
     std::cout << "Distance of separation (preset): " << val.distance_separation
               << "\nSimulation duration (preset): " << duration_second << "\n";
@@ -44,3 +47,10 @@ int main() {
     simulation(duration_second, fps, val);
   }
 }
+
+/* da sistemare:
+try, catch, throw
+const
+test
+compiler
+sfml */
