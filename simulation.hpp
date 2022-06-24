@@ -37,7 +37,6 @@ auto update_flock(int fps, Flock& flock, values const& val) {
 }
 
 auto simulation(double duration_second, int fps, values const& val) {
-  values val;
   Flock flock{{}};
   position cm;
   double steps_tot = duration_second * fps;

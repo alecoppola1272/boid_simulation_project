@@ -48,9 +48,4 @@ int main() {
   }
 }
 
-/* da sistemare:
-try, catch, throw
-const
-test
-compiler
-sfml */
+// test, compiler, sfml
