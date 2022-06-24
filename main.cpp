@@ -48,4 +48,4 @@ int main() {
   }
 }
 
-// test, compiler, sfml
+// test, sfml, accumulate
