@@ -14,12 +14,12 @@ struct values {
   double alignment_factor;
   double coesion_factor;
 
-  int const box_length{100};
-  int const edge_lenght{20};
+  int const box_length{1000};
+  int const edge_lenght{200};
   double const velocity_default{5.};
   double const velocity_max{10.};
   double const distance_separation{2.};
-  double const edge_factor{0.2};
+  double const edge_factor{0.5};
 };
 
 #include "simulation.hpp"
@@ -42,10 +42,11 @@ int main() {
     throw std::runtime_error{"Error input"};
   } else {
     std::cout << "Distance of separation (preset): " << val.distance_separation
-              << "\nSimulation duration (preset): " << duration_second << "\n";
+              << "\nSimulation duration (preset): " << duration_second << "\n\n";
 
     simulation(val, duration_second, fps);
   }
 }
 
 // test, sfml, accumulate
+// 50 5 0.5 0.5

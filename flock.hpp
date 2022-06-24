@@ -67,6 +67,23 @@ class Flock {
 
     return cm;
   }
+  
+  auto velocity_mean(int n_boids) {
+    velocity vm;
+    velocity sum;
+    sum.x = 0;
+    sum.y = 0;
+
+    for (auto it = flock_.begin(); it != flock_.end(); ++it) {
+      sum.x += it->v.x;
+      sum.y += it->v.y;
+    };
+
+    vm.x = sum.x / n_boids;
+    vm.y = sum.y / n_boids;
+
+    return vm;
+  }
 
   auto begin() { return flock_.begin(); }
   auto end() { return flock_.end(); }

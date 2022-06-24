@@ -41,19 +41,23 @@ auto update_flock(int fps, Flock& flock, values const& val) {
 void simulation(values const& val, double duration_second, int fps) {
   Flock flock{{}};
   position cm;
+  velocity vm;
   double steps_tot = duration_second * fps;
 
   flock.add_boids(val);
 
-  std::cout << "Centro di massa:";
+  std::cout << "Velocità media:\nStep\t|  vx\t\t|  vy\t\t|  px\t\t|  py\n------------------------------------------------------------------";
   for (int steps = 0; steps != steps_tot; ++steps) {
     flock = update_flock(fps, flock, val);
 
     cm = flock.center_mass(val.n_boids);
-    std::cout << '\n'
-              << "step" << steps + 1 << "\t\t|\tx = " << cm.x
-              << "\t|\ty = " << cm.y;
-    // SFML
+    vm = flock.velocity_mean(val.n_boids);
+    if ((steps + 1) % 10 == 0) {
+      std::cout << '\n'
+                << steps + 1 << "\t|  " << vm.x << "\t|  " << vm.y << "\t|  "
+                << cm.x << "\t|  " << cm.y;
+      // SFML
+    }
   }
   std::cout << "\n\n";
 }
