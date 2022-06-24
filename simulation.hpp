@@ -9,6 +9,7 @@ auto update_velocity(Flock& flock, values const& val) {
   for (std::vector<coordinates>::iterator it = flock.begin(); it != it_last;
        ++it) {
     velocity v_sum{0., 0.};
+
     v_sum = velocity_sum(v_sum, flock, it, val);
     v_sum = velocity_limit(v_sum, val);
 
