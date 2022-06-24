@@ -1,2 +1,6 @@
 a.out
-prova.cpp
+.clang-format
+.git
+.vscode
+doctest.h
+SFML-2.5.1
