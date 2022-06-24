@@ -6,7 +6,8 @@
 
 auto update_velocity(Flock& flock, values const& val) {
   std::vector<coordinates>::iterator it_last = std::prev(flock.end());
-  for (std::vector<coordinates>::iterator it = flock.begin(); it != it_last; ++it) {
+  for (std::vector<coordinates>::iterator it = flock.begin(); it != it_last;
+       ++it) {
     velocity v_sum{0., 0.};
     v_sum = velocity_sum(v_sum, flock, it, val);
     v_sum = velocity_limit(v_sum, val);
@@ -21,7 +22,8 @@ auto update_velocity(Flock& flock, values const& val) {
 auto update_position(Flock& flock, int fps) {
   std::vector<coordinates>::iterator it_last = std::prev(flock.end());
 
-  for (std::vector<coordinates>::iterator it = flock.begin(); it != it_last; ++it) {
+  for (std::vector<coordinates>::iterator it = flock.begin(); it != it_last;
+       ++it) {
     it->p.x += it->v.x / fps;
     it->p.y += it->v.y / fps;
   }
@@ -36,7 +38,7 @@ auto update_flock(int fps, Flock& flock, values const& val) {
   return flock;
 }
 
-auto simulation(double duration_second, int fps, values const& val) {
+void simulation(values const& val, double duration_second, int fps) {
   Flock flock{{}};
   position cm;
   double steps_tot = duration_second * fps;
@@ -48,11 +50,12 @@ auto simulation(double duration_second, int fps, values const& val) {
     flock = update_flock(fps, flock, val);
 
     cm = flock.center_mass(val.n_boids);
-    std::cout << "/n"
-              << "step" << steps + 1 << "   |   x = " << cm.x
-              << ",  y = " << cm.y;
+    std::cout << '\n'
+              << "step" << steps + 1 << "\t\t|\tx = " << cm.x
+              << "\t|\ty = " << cm.y;
     // SFML
   }
+  std::cout << "\n\n";
 }
 
 #endif

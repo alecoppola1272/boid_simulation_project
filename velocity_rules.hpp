@@ -52,7 +52,7 @@ auto coesion_velocity(Flock& flock, std::vector<coordinates>::iterator it,
   return v3;
 }
 
-auto edge_velocity(Flock& flock, std::vector<coordinates>::iterator it,
+auto edge_velocity(std::vector<coordinates>::iterator it,
                    values const& val) {
   velocity edge;
 
@@ -99,7 +99,7 @@ auto velocity_sum(velocity v_sum, Flock& flock,
   auto v1 = serparation_velocity(flock, val);
   auto v2 = alignment_velocity(flock, it, val);
   auto v3 = coesion_velocity(flock, it, val);
-  auto v4 = edge_velocity(flock, it, val);
+  auto v4 = edge_velocity(it, val);
 
   v_sum.x += v1.x + v2.x + v3.x + v4.x + it->v.x;
   v_sum.y += v1.y + v2.y + v3.y + v4.y + it->v.y;

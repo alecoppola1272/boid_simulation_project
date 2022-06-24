@@ -48,13 +48,19 @@ class Flock {
     sum.x = 0;
     sum.y = 0;
 
-    sum = std::accumulate(flock_.begin(), flock_.end(), sum,
-                          [](coordinates first, coordinates second) {
-                            position result;
-                            result.x = first.p.x + second.p.x;
-                            result.y = first.p.y + second.p.y;
-                            return result;
-                          });
+    for (auto it = flock_.begin(); it != flock_.end(); ++it) {
+      sum.x += it->p.x;
+      sum.y += it->p.y;
+    };
+
+    // sum = std::accumulate(flock_.begin(), flock_.end(), sum,
+    //                       [](coordinates const& first, coordinates const&
+    //                       second) {
+    //                         position result;
+    //                         result.x = first.p.x + second.p.x;
+    //                         result.y = first.p.y + second.p.y;
+    //                         return result;
+    //                       });
 
     cm.x = sum.x / (n_boids - 1);
     cm.y = sum.y / (n_boids - 1);
