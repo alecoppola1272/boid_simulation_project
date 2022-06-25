@@ -7,8 +7,10 @@ auto serparation_velocity(Flock& flock, values const& val) {
 
   // checking neighbors
   std::vector<coordinates>::iterator it_last = std::prev(flock.end());
-  for (std::vector<coordinates>::iterator it1 = flock.begin(); it1 != it_last; ++it1) {
-    for (std::vector<coordinates>::iterator it2 = flock.begin(); it2 != it_last; ++it2) {
+  for (std::vector<coordinates>::iterator it1 = flock.begin(); it1 != it_last;
+       ++it1) {
+    for (std::vector<coordinates>::iterator it2 = flock.begin(); it2 != it_last;
+         ++it2) {
       if (it1 != it2 &&
           std::abs(it1->p.x - it2->p.x) < val.distance_separation &&
           std::abs(it1->p.y - it2->p.y) < val.distance_separation) {
@@ -30,7 +32,8 @@ auto alignment_velocity(Flock& flock, std::vector<coordinates>::iterator it,
   velocity v2_sum{0., 0.};
 
   std::vector<coordinates>::iterator it_last = std::prev(flock.end());
-  for (std::vector<coordinates>::iterator it = flock.begin(); it != it_last; ++it) {
+  for (std::vector<coordinates>::iterator it = flock.begin(); it != it_last;
+       ++it) {
     v2_sum.x += it->p.x;
     v2_sum.y += it->p.y;
   }
@@ -52,8 +55,7 @@ auto coesion_velocity(Flock& flock, std::vector<coordinates>::iterator it,
   return v3;
 }
 
-auto edge_velocity(std::vector<coordinates>::iterator it,
-                   values const& val) {
+auto edge_velocity(std::vector<coordinates>::iterator it, values const& val) {
   velocity edge;
 
   if ((it->p.x < val.edge_lenght && it->v.x < val.velocity_default) ||

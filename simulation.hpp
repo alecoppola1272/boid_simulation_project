@@ -41,8 +41,8 @@ auto update_flock(int fps, Flock& flock, values const& val) {
 
 void simulation(values const& val, double duration_second, int fps) {
   Flock flock{{}};
-  position cm;
-  velocity vm;
+  position cm{};
+  velocity vm{};
   double steps_tot = duration_second * fps;
 
   flock.add_boids(val);
@@ -58,6 +58,7 @@ void simulation(values const& val, double duration_second, int fps) {
                 << steps + 1 << "\t|  " << vm.x << "\t|  " << vm.y << "\t|  "
                 << cm.x << "\t|  " << cm.y;
       // SFML
+      // cin e cout nel main
     }
   }
   std::cout << "\n\n";

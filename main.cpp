@@ -1,18 +1,16 @@
 struct values {
-  int n_boids;
-  double separation_factor;
-  double alignment_factor;
-  double coesion_factor;
+  int n_boids{};
+  double separation_factor{};
+  double alignment_factor{};
+  double coesion_factor{};
 
   int const box_length{1000};
   int const edge_lenght{200};
   double const velocity_default{5.};
   double const velocity_max{10.};
-  double const distance_separation{2.};
+  double const distance_separation{1.};
   double const edge_factor{0.5};
 };
-
-
 
 #include "simulation.hpp"
 int main() {
@@ -30,7 +28,7 @@ int main() {
   std::cin >> val.coesion_factor;
 
   if (val.alignment_factor >= 1) {
-    throw std::runtime_error{"Error input"};
+    throw std::runtime_error{"Separation factor must be < 1"};
   } else {
     std::cout << "Distance of separation (preset): " << val.distance_separation
               << "\nSimulation duration (preset): " << duration_second
@@ -41,4 +39,5 @@ int main() {
 }
 
 // test, sfml, accumulate
-// 50 5 0.5 0.5
+
+// 100 3 0.2 2 (check coesion factor)
