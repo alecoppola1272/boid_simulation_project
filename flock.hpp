@@ -1,6 +1,15 @@
 #ifndef FLOCK_HPP
 #define FLOCK_HPP
 
+#include <array>
+#include <cmath>
+
+#include <numeric>
+#include <random>
+#include <vector>
+#include <stdexcept>
+#include <cassert>
+ 
 struct position {
   double x;
   double y;

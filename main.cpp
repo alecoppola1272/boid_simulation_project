@@ -1,13 +1,3 @@
-#include <array>
-#include <cmath>
-#include <iostream>
-#include <numeric>
-#include <random>
-#include <vector>
-
-#include <stdexcept>
-#include <cassert>
-
 struct values {
   int n_boids;
   double separation_factor;
@@ -22,8 +12,9 @@ struct values {
   double const edge_factor{0.5};
 };
 
-#include "simulation.hpp"
 
+
+#include "simulation.hpp"
 int main() {
   values val;
   double const duration_second{20.0};
@@ -42,7 +33,8 @@ int main() {
     throw std::runtime_error{"Error input"};
   } else {
     std::cout << "Distance of separation (preset): " << val.distance_separation
-              << "\nSimulation duration (preset): " << duration_second << "\n\n";
+              << "\nSimulation duration (preset): " << duration_second
+              << "\n\n";
 
     simulation(val, duration_second, fps);
   }

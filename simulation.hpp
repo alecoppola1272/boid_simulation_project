@@ -3,6 +3,7 @@
 
 #include "flock.hpp"
 #include "velocity_rules.hpp"
+#include <iostream>
 
 auto update_velocity(Flock& flock, values const& val) {
   std::vector<coordinates>::iterator it_last = std::prev(flock.end());
