@@ -47,7 +47,7 @@ void simulation(values const& val, double duration_second, int fps) {
 
   flock.add_boids(val);
 
-  std::cout << "Velocità media:\nStep\t|  vx\t\t|  vy\t\t|  px\t\t|  py\n------------------------------------------------------------------";
+  std::cout << "Velocità media:\nStep\t|  vx\t\t|  vy\t\t|  px\t\t|  py\n-------------------------------------------------------------------";
   for (int steps = 0; steps != steps_tot; ++steps) {
     flock = update_flock(fps, flock, val);
 
