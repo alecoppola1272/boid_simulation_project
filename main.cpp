@@ -1,12 +1,11 @@
 #include <array>
+#include <cassert>
 #include <cmath>
 #include <iostream>
 #include <numeric>
 #include <random>
-#include <vector>
-
 #include <stdexcept>
-#include <cassert>
+#include <vector>
 
 struct values {
   int n_boids;
@@ -14,12 +13,15 @@ struct values {
   double alignment_factor;
   double coesion_factor;
 
-  int const box_length{1000};
-  int const edge_lenght{200};
+  int const box_length{100};
+  int const edge_lenght{10};
+  int const visual_steps{50};
   double const velocity_default{5.};
   double const velocity_max{10.};
-  double const distance_separation{2.};
+  double const distance_neighbors{10.};
+  double const distance_separation{1.};
   double const edge_factor{0.5};
+  double const boid_vision{30.};
 };
 
 #include "simulation.hpp"
@@ -42,11 +44,13 @@ int main() {
     throw std::runtime_error{"Error input"};
   } else {
     std::cout << "Distance of separation (preset): " << val.distance_separation
-              << "\nSimulation duration (preset): " << duration_second << "\n\n";
+              << "\nSimulation duration (preset): " << duration_second
+              << "\n\n";
 
     simulation(val, duration_second, fps);
   }
 }
 
-// test, sfml, accumulate
-// 50 5 0.5 0.5
+/* test, sfml, accumulate, vista boid
+50 0.1 0.1 0.1
+*/
