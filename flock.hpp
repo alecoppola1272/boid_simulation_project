@@ -88,8 +88,8 @@ class Flock {
     position sum{0., 0.};
     int i;
 
-    for (auto it1 = flock_.begin(); it1 != std::prev(flock_.end()); ++it1) {
-      for (auto it2 = std::next(it1); it2 != flock_.end(); ++it2) {
+    for (auto it1 = flock_.begin(); it1 != std::prev(std::prev(flock_.end())); ++it1) {
+      for (auto it2 = std::next(it1); it2 != std::prev(flock_.end()); ++it2) {
         sum.x += std::abs(it1->p.x - it2->p.x);
         sum.y += std::abs(it1->p.y - it2->p.y);
         ++i;

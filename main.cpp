@@ -3,16 +3,17 @@ struct values {
   double separation_factor{};
   double alignment_factor{};
   double coesion_factor{};
+  double const edge_factor{0.1};
 
   int const box_length{100};
   int const edge_lenght{10};
   int const visual_steps{50};
+  int const precision_output{8};
   double const velocity_default{5.};
-  double const velocity_max{10.};
+  double const velocity_max{20.};
   double const distance_neighbors{10.};
-  double const distance_separation{1.};
-  double const edge_factor{0.5};
-  double const boid_vision{30.};
+  double const distance_separation{3.};
+  double const boid_vision_angle{90.};
 };
 
 #include "simulation.hpp"
