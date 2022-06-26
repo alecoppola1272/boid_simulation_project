@@ -1,23 +1,25 @@
 #ifndef SIMULATION_HPP
 #define SIMULATION_HPP
 
+#include <iostream>
+
 #include "flock.hpp"
 #include "velocity_rules.hpp"
 
 auto update_velocity(Flock& flock, values const& val) {
   for (auto it1 = flock.begin(); it1 != std::prev(flock.end()); ++it1) {
-    std::vector<std::vector<coordinates>::iterator> neighbors;
-    for (auto it2 = flock.begin(); it2 != std::prev(flock.end()); ++it2) {
-      if (it2 != it1 && std::sqrt(std::pow(std::abs(it1->p.x - it2->p.x), 2.) +
-                                  (std::pow(std::abs(it1->p.y - it2->p.y),
-                                            2.))) <= val.distance_neighbors) {
-        // vista boid
-        neighbors.push_back(it1);  // iteratore o coordinates?
-      }
-    }
+    // std::vector<std::vector<coordinates>::iterator> neighbors;
+    // for (auto it2 = flock.begin(); it2 != std::prev(flock.end()); ++it2) {
+    //   if (it2 != it1 && std::sqrt(std::pow(std::abs(it1->p.x - it2->p.x), 2.) +
+    //                               (std::pow(std::abs(it1->p.y - it2->p.y),
+    //                                         2.))) <= val.distance_neighbors) {
+    //     // vista boid
+    //     neighbors.push_back(it1);  // iteratore o coordinates?
+    //   }
+    // }
 
     velocity v_sum{0., 0.};
-    v_sum = velocity_sum(v_sum, neighbors, it1, val);
+    v_sum = velocity_sum(v_sum, flock, it1, val);
     v_sum = velocity_limit(v_sum, val);
 
     it1->v.x = v_sum.x;
@@ -47,9 +49,9 @@ auto update_flock(int fps, Flock& flock, values const& val) {
 
 void simulation(values const& val, double duration_second, int fps) {
   Flock flock{{}};
-  position cm;
-  velocity vm;
-  position dsm;
+  position cm{};
+  velocity vm{};
+  position dsm{};
   double steps_tot = duration_second * fps;
 
   flock.add_boids(val);
@@ -70,6 +72,7 @@ void simulation(values const& val, double duration_second, int fps) {
                 << cm.x << "\t|  " << cm.y << "\t|  " << dsm.x << "\t|  "
                 << dsm.y;
       // SFML
+      // cin e cout nel main
     }
   }
   std::cout << "\n\n";

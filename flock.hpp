@@ -1,6 +1,13 @@
 #ifndef FLOCK_HPP
 #define FLOCK_HPP
 
+#include <cassert>
+#include <cmath>
+#include <numeric>
+#include <random>
+#include <stdexcept>
+#include <vector>
+
 struct position {
   double x;
   double y;
@@ -23,7 +30,7 @@ class Flock {
   Flock(std::vector<coordinates> flock) : flock_{flock} {}
 
   auto add_boids(values const& val) {
-    coordinates new_boid;
+    coordinates new_boid{};
 
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -43,12 +50,12 @@ class Flock {
   }
 
   auto center_mass(int n_boids) {
-    position cm;
-    position sum;
-    sum.x = 0;
-    sum.y = 0;
+    position cm{};
+    position sum{};
+    sum.x = 0.0;
+    sum.y = 0.0;
 
-    for (auto it = flock_.begin(); it != flock_.end(); ++it) {
+    for (auto it = flock_.begin(); it != std::prev(flock_.end()); ++it) {
       sum.x += it->p.x;
       sum.y += it->p.y;
     };
@@ -60,12 +67,12 @@ class Flock {
   }
 
   auto velocity_mean(int n_boids) {
-    velocity vm;
-    velocity sum;
-    sum.x = 0;
-    sum.y = 0;
+    velocity vm{};
+    velocity sum{};
+    sum.x = 0.0;
+    sum.y = 0.0;
 
-    for (auto it = flock_.begin(); it != flock_.end(); ++it) {
+    for (auto it = flock_.begin(); it != std::prev(flock_.end()); ++it) {
       sum.x += it->v.x;
       sum.y += it->v.y;
     };
