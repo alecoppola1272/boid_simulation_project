@@ -4,15 +4,19 @@ struct values {
   double alignment_factor{};
   double coesion_factor{};
 
-  int const box_length{1000};
-  int const edge_lenght{200};
+  int const box_length{100};
+  int const edge_lenght{10};
+  int const visual_steps{50};
   double const velocity_default{5.};
   double const velocity_max{10.};
+  double const distance_neighbors{10.};
   double const distance_separation{1.};
   double const edge_factor{0.5};
+  double const boid_vision{30.};
 };
 
 #include "simulation.hpp"
+
 int main() {
   values val;
   double const duration_second{20.0};
@@ -38,6 +42,7 @@ int main() {
   }
 }
 
-// test, sfml, accumulate
-
-// 100 3 0.2 2 (check coesion factor)
+/* test, sfml, accumulate, vista boid
+50 0.1 0.1 0.1
+100 3 0.2 2 (check coesion factor)
+*/

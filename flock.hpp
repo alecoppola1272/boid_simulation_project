@@ -60,15 +60,6 @@ class Flock {
       sum.y += it->p.y;
     };
 
-    // sum = std::accumulate(flock_.begin(), flock_.end(), sum,
-    //                       [](coordinates const& first, coordinates const&
-    //                       second) {
-    //                         position result;
-    //                         result.x = first.p.x + second.p.x;
-    //                         result.y = first.p.y + second.p.y;
-    //                         return result;
-    //                       });
-
     cm.x = sum.x / (n_boids - 1);
     cm.y = sum.y / (n_boids - 1);
 
@@ -92,8 +83,35 @@ class Flock {
     return vm;
   }
 
+  auto dseparation_mean(int n_boids) {
+    position dsm;
+    position sum{0., 0.};
+    int i;
+
+    for (auto it1 = flock_.begin(); it1 != std::prev(flock_.end()); ++it1) {
+      for (auto it2 = std::next(it1); it2 != flock_.end(); ++it2) {
+        sum.x += std::abs(it1->p.x - it2->p.x);
+        sum.y += std::abs(it1->p.y - it2->p.y);
+        ++i;
+      }
+    }
+
+    dsm.x = sum.x / i;
+    dsm.y = sum.y / i;
+
+    return dsm;
+  }
+
   auto begin() { return flock_.begin(); }
   auto end() { return flock_.end(); }
 };
 
 #endif
+
+/* sum = std::accumulate(flock_.begin(), flock_.end(), sum,
+                      [](coordinates const& first, coordinates const& second) {
+                        position result;
+                        result.x = first.p.x + second.p.x;
+                        result.y = first.p.y + second.p.y;
+                        return result;
+                      }); */
