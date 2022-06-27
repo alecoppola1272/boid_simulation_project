@@ -17,7 +17,7 @@ auto update_velocity(Flock& flock, values const& val) {
     //                                         2.))) <= val.distance_neighbors)
     //                                         {
     //     // vista boid
-    //     neighbors.push_back(it1);  // iteratore o coordinates?
+    //     neighbors.push_back(it1);
     //   }
     // }
 
@@ -57,10 +57,12 @@ void simulation(values const& val, double duration_second, int fps) {
 
   flock.add_boids(val);
 
-  std::cout << "Step\t| vm x\t\t| vm y\t\t| cm x\t\t| cm y\t\t| dsm x\t\t| "
-               "dsm y\n";
-  std::cout << "---------------------------------------------------------------"
-               "-----------------------------------";
+  std::cout << "Step |    vm x |    vm y |    cm x |    cm y |   dsm "
+               "x |   dsm y"
+            << std::endl;
+  std::cout
+      << "---------------------------------------------------------------- "
+      << std::endl;
   for (int steps = 0; steps != steps_tot; ++steps) {
     flock = update_flock(fps, flock, val);
 
@@ -69,16 +71,18 @@ void simulation(values const& val, double duration_second, int fps) {
     dsm = flock.dseparation_mean(val.n_boids);
 
     if ((steps + 1) % val.visual_steps == 0 || steps == 0) {
-      std::cout << '\n'
-                << steps + 1 << "\t| " << std::setw(val.precision_output) << vm.x << "\t| "
-                << std::setw(val.precision_output) << vm.y << "\t| " << std::setw(val.precision_output) << cm.x
-                << "\t| " << std::setw(val.precision_output) << cm.y << "\t| " << std::setw(val.precision_output)
-                << dsm.x << "\t| " << std::setw(val.precision_output) << dsm.y;
+      std::cout << std::fixed << std::setprecision(2) << std::setw(4)
+                << steps + 1 << " | " << std::setw(val.precision_output) << vm.x
+                << " | " << std::setw(val.precision_output) << vm.y << " | "
+                << std::setw(val.precision_output) << cm.x << " | "
+                << std::setw(val.precision_output) << cm.y << " | "
+                << std::setw(val.precision_output) << dsm.x << " | "
+                << std::setw(val.precision_output) << dsm.y << std::endl;
       // SFML
       // cin e cout nel main
     }
   }
-  std::cout << "\n\n";
+  std::cout << "\n";
 }
 
 #endif

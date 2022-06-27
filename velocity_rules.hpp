@@ -6,10 +6,11 @@ auto serparation_velocity(Flock& flock, values const& val) {
   velocity v1_sum{0., 0.};
 
   // overlap
-  for (auto it1 = flock.begin(); it1 != std::prev(flock.end()); ++it1) {
+  for (auto it1 = flock.begin(); it1 != std::prev(std::prev(flock.end()));
+       ++it1) {
     for (auto it2 = std::next(it1); it2 != std::prev(flock.end()); ++it2) {
-      if (std::sqrt(std::pow(std::abs(it1->p.x - it2->p.x), 2.) +
-                    (std::pow(std::abs(it1->p.y - it2->p.y), 2.))) <=
+      if (std::sqrt(std::pow(it1->p.x - it2->p.x, 2.) +
+                    (std::pow(it1->p.y - it2->p.y, 2.))) <=
           val.distance_separation) {
         v1_sum.x += it2->p.x - it1->p.x;
         v1_sum.y += it2->p.y - it1->p.y;
