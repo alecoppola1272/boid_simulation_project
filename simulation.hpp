@@ -1,9 +1,10 @@
 #ifndef SIMULATION_HPP
 #define SIMULATION_HPP
 
+#include <iostream>
+
 #include "flock.hpp"
 #include "velocity_rules.hpp"
-#include <iostream>
 
 auto update_velocity(Flock& flock, values const& val) {
   std::vector<coordinates>::iterator it_last = std::prev(flock.end());
@@ -47,7 +48,9 @@ void simulation(values const& val, double duration_second, int fps) {
 
   flock.add_boids(val);
 
-  std::cout << "Velocità media:\nStep\t|  vx\t\t|  vy\t\t|  px\t\t|  py\n-------------------------------------------------------------------";
+  std::cout << "Velocità media:\nStep\t|  vx\t\t|  vy\t\t|  px\t\t|  "
+               "py\n-----------------------------------------------------------"
+               "--------";
   for (int steps = 0; steps != steps_tot; ++steps) {
     flock = update_flock(fps, flock, val);
 
