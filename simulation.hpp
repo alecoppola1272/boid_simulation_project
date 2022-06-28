@@ -1,5 +1,8 @@
 #ifndef SIMULATION_HPP
 #define SIMULATION_HPP
+#define _USE_MATH_DEFINES
+
+#include <cmath>
 
 #include <iomanip>
 #include <iostream>
@@ -9,17 +12,32 @@
 
 auto update_velocity(Flock& flock, values const& val) {
   for (auto it1 = flock.begin(); it1 != std::prev(flock.end()); ++it1) {
-    // std::vector<std::vector<coordinates>::iterator> neighbors;
-    // for (auto it2 = flock.begin(); it2 != std::prev(flock.end()); ++it2) {
-    //   if (it2 != it1 && std::sqrt(std::pow(std::abs(it1->p.x - it2->p.x), 2.)
-    //   +
-    //                               (std::pow(std::abs(it1->p.y - it2->p.y),
-    //                                         2.))) <= val.distance_neighbors)
-    //                                         {
-    //     // vista boid
-    //     neighbors.push_back(it1);
-    //   }
-    // }
+    std::vector<std::vector<coordinates>::iterator> neighbors;
+
+    // checking neighbors
+    for (auto it2 = flock.begin(); it2 != std::prev(flock.end()); ++it2) {
+      if (it2 != it1 && std::sqrt(std::pow(std::abs(it1->p.x - it2->p.x), 2.) +
+                                  (std::pow(std::abs(it1->p.y - it2->p.y),
+                                            2.))) <= val.distance_neighbors) {
+        // boid vision
+        double radius_direction = std::sqrt(std::pow(std::abs(it1->v.x), 2.) +
+                                            (std::pow(std::abs(it1->v.y), 2.)));
+        double alpha = std::asin(it1->p.y / radius_direction); // prendere valore giusto dei due
+        if (alpha < 0){alpha =+ M_PI;}
+        // double alpha2 = std::acos(it1->p.x / radius_direction);
+
+        double radius_distance_boid =
+            std::sqrt(std::pow(std::abs(it1->p.x - it2->p.x), 2.) +
+                      (std::pow(std::abs(it1->p.y - it2->p.y), 2.)));
+        double beta = std::asin((it2->p.y - it1->p.y) / radius_distance_boid);
+        // double beta2 = std::acos((it2->p.x - it1->p.x) / radius_distance_boid);
+
+        if (beta < (alpha + M_PI - (M_PI * val.boid_vision_angle / 360)) &&
+            beta > (alpha + M_PI + (M_PI * val.boid_vision_angle / 360))) { // controllo
+          neighbors.push_back(it2);
+        }
+      }
+    }
 
     velocity v_sum{0., 0.};
     v_sum = velocity_sum(v_sum, flock, it1, val);
@@ -68,7 +86,7 @@ void simulation(values const& val, double duration_second, int fps) {
 
     cm = flock.center_mass(val.n_boids);
     vm = flock.velocity_mean(val.n_boids);
-    dsm = flock.dseparation_mean(val.n_boids);
+    dsm = flock.dseparation_mean();
 
     if ((steps + 1) % val.visual_steps == 0 || steps == 0) {
       std::cout << std::fixed << std::setprecision(2) << std::setw(4)

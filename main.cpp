@@ -39,7 +39,8 @@ int main() {
   // if (val.alignment_factor >= 1) {
   //   throw std::runtime_error{"Separation factor must be < 1"};
   // } else {
-  //   std::cout << "Edge factor: " << val.edge_factor << "Distance of separation (preset): " << val.distance_separation
+  //   std::cout << "Edge factor: " << val.edge_factor
+  //             << "Distance of separation (preset): " << val.distance_separation
   //             << "\nSimulation duration (preset): " << val.duration_second
   //             << "\n\n";
 
@@ -47,4 +48,4 @@ int main() {
   // }
 }
 
-// test, sfml, accumulate, vista boid
+// test, sfml, accumulate, vista boid, operator+/-/*/: in cooesion

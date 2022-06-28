@@ -3,6 +3,8 @@
 
 #include <random>
 
+// operator+()
+
 struct position {
   double x;
   double y;
@@ -46,9 +48,7 @@ class Flock {
 
   auto center_mass(int n_boids) {
     position cm{};
-    position sum{};
-    sum.x = 0.0;
-    sum.y = 0.0;
+    position sum{0., 0.};
 
     for (auto it = flock_.begin(); it != std::prev(flock_.end()); ++it) {
       sum.x += it->p.x;
@@ -63,9 +63,7 @@ class Flock {
 
   auto velocity_mean(int n_boids) {
     velocity vm{};
-    velocity sum{};
-    sum.x = 0.0;
-    sum.y = 0.0;
+    velocity sum{0., 0.};
 
     for (auto it = flock_.begin(); it != std::prev(flock_.end()); ++it) {
       sum.x += it->v.x;
@@ -78,7 +76,7 @@ class Flock {
     return vm;
   }
 
-  auto dseparation_mean(int n_boids) {
+  auto dseparation_mean() {
     position dsm;
     position sum{0., 0.};
     int i;
