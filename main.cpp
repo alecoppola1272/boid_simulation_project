@@ -1,5 +1,5 @@
 struct values {
-  int n_boids{50};
+  int n_boids{30};
   double separation_factor{0.1};
   double alignment_factor{0.1};
   double coesion_factor{0.1};
@@ -14,8 +14,8 @@ struct values {
   double const velocity_default{5.};
   double const velocity_max{20.};
 
-  double const distance_neighbors{10.};
-  double const distance_separation{3.};
+  double const distance_neighbors{15.};
+  double const distance_separation{2.};
   double const boid_vision_angle{30.};
 
   double const duration_second{20.0};
@@ -45,7 +45,7 @@ int main() {
   //             << "\nSimulation duration (preset): " << val.duration_second
   //             << "\n\n";
 
-  simulation(val, val.duration_second, val.fps);
+  simulation(val);
   // }
 }
 

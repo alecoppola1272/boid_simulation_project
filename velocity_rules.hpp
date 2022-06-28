@@ -1,7 +1,7 @@
 #ifndef VELOCITY_RULES_HPP
 #define VELOCITY_RULES_HPP
 
-auto overlap(std::vector<std::vector<coordinates>::iterator> const& neighbors,
+void overlap(std::vector<std::vector<coordinates>::iterator> const& neighbors,
              values const& val, velocity& v1_sum) {
   for (auto it1 = neighbors.begin();
        it1 != std::prev(std::prev(neighbors.end())); ++it1) {
@@ -9,15 +9,13 @@ auto overlap(std::vector<std::vector<coordinates>::iterator> const& neighbors,
     for (auto it2 = std::next(it1); it2 != std::prev(neighbors.end()); ++it2) {
       std::vector<coordinates>::iterator it2_ = *it2;
 
-      if (std::sqrt(std::pow(it1_->p.x - it2_->p.x, 2.) +
-                    (std::pow(it1_->p.y - it2_->p.y, 2.))) <=
+      if (std::hypot(it1_->p.x - it2_->p.x, it1_->p.y - it2_->p.y) <=
           val.distance_separation) {
         v1_sum.x += it2_->p.x - it1_->p.x;
         v1_sum.y += it2_->p.y - it1_->p.y;
       }
     }
   }
-  return v1_sum;
 }
 
 auto serparation_velocity(
@@ -26,7 +24,7 @@ auto serparation_velocity(
   velocity v1{};
   velocity v1_sum{0., 0.};
 
-  v1_sum = overlap(neighbors, val, v1_sum);
+  overlap(neighbors, val, v1_sum);
 
   v1.x = -val.separation_factor * v1_sum.x;
   v1.y = -val.separation_factor * v1_sum.y;
@@ -36,7 +34,7 @@ auto serparation_velocity(
 
 auto alignment_velocity(
     std::vector<std::vector<coordinates>::iterator> const& neighbors,
-    std::vector<coordinates>::iterator const it, values const& val) {
+    std::vector<coordinates>::iterator const& it, values const& val) {
   velocity v2{};
   velocity v2_sum{0., 0.};
 
@@ -55,7 +53,7 @@ auto alignment_velocity(
 }
 
 auto center_mass(
-    position cm, int const& n_boids,
+    position& cm, int const& n_boids,
     std::vector<std::vector<coordinates>::iterator> const& neighbors) {
   position sum{};
 
@@ -74,7 +72,7 @@ auto center_mass(
 
 auto coesion_velocity(
     std::vector<std::vector<coordinates>::iterator> const& neighbors,
-    std::vector<coordinates>::iterator const it, values const& val) {
+    std::vector<coordinates>::iterator const& it, values const& val) {
   velocity v3{};
   position cm{};
 
@@ -86,7 +84,7 @@ auto coesion_velocity(
   return v3;
 }
 
-auto edge_velocity(std::vector<coordinates>::iterator const it,
+auto edge_velocity(std::vector<coordinates>::iterator const& it,
                    values const& val) {
   velocity edge{};
 
@@ -108,39 +106,35 @@ auto edge_velocity(std::vector<coordinates>::iterator const it,
   return edge;
 }
 
-auto velocity_limit(velocity v_sum, values const& val) {
-  if ((std::abs(v_sum.x) > val.velocity_max)) {
-    if (v_sum.x > 0) {
-      v_sum.x = val.velocity_max;
+void velocity_limit(std::vector<coordinates>::iterator const& it,
+                    values const& val) {
+  if ((std::abs(it->v.x) > val.velocity_max)) {
+    if (it->v.x > 0) {
+      it->v.x = val.velocity_max;
     } else {
-      v_sum.x = -val.velocity_max;
+      it->v.x = -val.velocity_max;
     }
   }
 
-  if ((std::abs(v_sum.y) > val.velocity_max)) {
-    if (v_sum.y > 0) {
-      v_sum.y = val.velocity_max;
+  if ((std::abs(it->v.y) > val.velocity_max)) {
+    if (it->v.y > 0) {
+      it->v.y = val.velocity_max;
     } else {
-      v_sum.y = -val.velocity_max;
+      it->v.y = -val.velocity_max;
     }
   }
-
-  return v_sum;
 }
 
-auto velocity_sum(
-    velocity v_sum,
+void velocity_sum(
     std::vector<std::vector<coordinates>::iterator> const& neighbors,
-    std::vector<coordinates>::iterator const it, values const& val) {
+    std::vector<coordinates>::iterator const& it, values const& val) {
   auto v1 = serparation_velocity(neighbors, val);
   auto v2 = alignment_velocity(neighbors, it, val);
   auto v3 = coesion_velocity(neighbors, it, val);
   auto v4 = edge_velocity(it, val);
 
-  v_sum.x += v1.x + v2.x + v3.x + v4.x + it->v.x;
-  v_sum.y += v1.y + v2.y + v3.y + v4.y + it->v.y;
-
-  return v_sum;
+  it->v.x += v1.x + v2.x + v3.x + v4.x;
+  it->v.y += v1.y + v2.y + v3.y + v4.y;
 }
 
 #endif

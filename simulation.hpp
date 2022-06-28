@@ -9,19 +9,18 @@
 #include "flock.hpp"
 #include "velocity_rules.hpp"
 
-auto boid_vision(std::vector<coordinates>::iterator it1,
-                 std::vector<coordinates>::iterator it2, values const& val,
+void boid_vision(std::vector<coordinates>::iterator& it1,
+                 std::vector<coordinates>::iterator& it2, values const& val,
                  std::vector<std::vector<coordinates>::iterator>& neighbors) {
-  double radius_direction = std::sqrt(std::pow(std::abs(it1->v.x), 2.) +
-                                      (std::pow(std::abs(it1->v.y), 2.)));
+  double radius_direction = std::hypot(it1->v.x, it1->v.y);
   double alpha =
       std::asin(it1->v.y / radius_direction);  // prendere valore giusto dei due
   if (alpha < 0) {
     alpha += M_PI;
   }
 
-  double radius_distance_boid = std::sqrt(std::pow(it1->p.x - it2->p.x, 2.) +
-                                          (std::pow(it1->p.y - it2->p.y, 2.)));
+  double radius_distance_boid =
+      std::hypot(it1->p.x - it2->p.x, it1->p.y - it2->p.y);
   double beta = std::asin((it2->p.y - it1->p.y) / radius_distance_boid);
   if (beta < 0) {
     beta += M_PI;
@@ -31,60 +30,47 @@ auto boid_vision(std::vector<coordinates>::iterator it1,
       beta > (alpha + M_PI + (M_PI * val.boid_vision_angle / 180))) {
     neighbors.push_back(it2);
   }
-  return neighbors;
 }
 
-auto checking_neighbors(
-    Flock& flock, std::vector<coordinates>::iterator it1, values const& val,
+void checking_neighbors(
+    Flock& flock, std::vector<coordinates>::iterator& it1, values const& val,
     std::vector<std::vector<coordinates>::iterator>& neighbors) {
   for (auto it2 = flock.begin(); it2 != std::prev(flock.end()); ++it2) {
-    if (it2 != it1 && std::sqrt(std::pow(it1->p.x - it2->p.x, 2.) +
-                                (std::pow(it1->p.y - it2->p.y, 2.))) <=
+    if (it2 != it1 && std::hypot(it1->p.x - it2->p.x, it1->p.y - it2->p.y) <=
                           val.distance_neighbors) {
-      neighbors = boid_vision(it1, it2, val, neighbors);
+      boid_vision(it1, it2, val, neighbors);
     }
   }
-  return neighbors;
 }
 
-auto update_velocity(Flock& flock, values const& val) {
+void update_velocity(Flock& flock, values const& val) {
   for (auto it1 = flock.begin(); it1 != std::prev(flock.end()); ++it1) {
     std::vector<std::vector<coordinates>::iterator> neighbors;
-    neighbors = checking_neighbors(flock, it1, val, neighbors);
+    checking_neighbors(flock, it1, val, neighbors);
 
-    velocity v_sum{};
-    v_sum = velocity_sum(v_sum, neighbors, it1, val);
-    v_sum = velocity_limit(v_sum, val);
-
-    it1->v.x = v_sum.x;
-    it1->v.y = v_sum.y;
+    velocity_sum(neighbors, it1, val);
+    velocity_limit(it1, val);
   }
-
-  return flock;
 }
 
-auto update_position(Flock& flock, int fps) {
+void update_position(Flock& flock, int const& fps) {
   for (auto it = flock.begin(); it != std::prev(flock.end()); ++it) {
     it->p.x += it->v.x / fps;
     it->p.y += it->v.y / fps;
   }
-
-  return flock;
 }
 
-auto update_flock(int fps, Flock& flock, values const& val) {
-  flock = update_velocity(flock, val);
-  flock = update_position(flock, fps);
-
-  return flock;
+void update_flock(Flock& flock, values const& val) {
+  update_velocity(flock, val);
+  update_position(flock, val.fps);
 }
 
-void simulation(values const& val, double duration_second, int fps) {
+void simulation(values const& val) {
   Flock flock{{}};
   position cm{};
   velocity vm{};
   position dsm{};
-  double steps_tot = duration_second * fps;
+  double steps_tot = val.duration_second * val.fps;
 
   flock.add_boids(val);
 
@@ -95,7 +81,7 @@ void simulation(values const& val, double duration_second, int fps) {
       << "---------------------------------------------------------------- "
       << std::endl;
   for (int steps = 0; steps != steps_tot; ++steps) {
-    flock = update_flock(fps, flock, val);
+    update_flock(flock, val);
 
     cm = flock.center_mass(val.n_boids);
     vm = flock.velocity_mean(val.n_boids);
