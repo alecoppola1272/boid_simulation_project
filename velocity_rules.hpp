@@ -1,22 +1,32 @@
 #ifndef VELOCITY_RULES_HPP
 #define VELOCITY_RULES_HPP
 
-auto serparation_velocity(Flock& flock, values const& val) {
-  velocity v1;
-  velocity v1_sum{0., 0.};
+auto overlap(std::vector<std::vector<coordinates>::iterator> const& neighbors,
+             values const& val, velocity& v1_sum) {
+  for (auto it1 = neighbors.begin();
+       it1 != std::prev(std::prev(neighbors.end())); ++it1) {
+    std::vector<coordinates>::iterator it1_ = *it1;
+    for (auto it2 = std::next(it1); it2 != std::prev(neighbors.end()); ++it2) {
+      std::vector<coordinates>::iterator it2_ = *it2;
 
-  // overlap
-  for (auto it1 = flock.begin(); it1 != std::prev(std::prev(flock.end()));
-       ++it1) {
-    for (auto it2 = std::next(it1); it2 != std::prev(flock.end()); ++it2) {
-      if (std::sqrt(std::pow(it1->p.x - it2->p.x, 2.) +
-                    (std::pow(it1->p.y - it2->p.y, 2.))) <=
+      if (std::sqrt(std::pow(it1_->p.x - it2_->p.x, 2.) +
+                    (std::pow(it1_->p.y - it2_->p.y, 2.))) <=
           val.distance_separation) {
-        v1_sum.x += it2->p.x - it1->p.x;
-        v1_sum.y += it2->p.y - it1->p.y;
+        v1_sum.x += it2_->p.x - it1_->p.x;
+        v1_sum.y += it2_->p.y - it1_->p.y;
       }
     }
   }
+  return v1_sum;
+}
+
+auto serparation_velocity(
+    std::vector<std::vector<coordinates>::iterator> const& neighbors,
+    values const& val) {
+  velocity v1{};
+  velocity v1_sum{0., 0.};
+
+  v1_sum = overlap(neighbors, val, v1_sum);
 
   v1.x = -val.separation_factor * v1_sum.x;
   v1.y = -val.separation_factor * v1_sum.y;
@@ -24,15 +34,17 @@ auto serparation_velocity(Flock& flock, values const& val) {
   return v1;
 }
 
-auto alignment_velocity(Flock& flock, std::vector<coordinates>::iterator it,
-                        values const& val) {
-  velocity v2;
+auto alignment_velocity(
+    std::vector<std::vector<coordinates>::iterator> const& neighbors,
+    std::vector<coordinates>::iterator const it, values const& val) {
+  velocity v2{};
   velocity v2_sum{0., 0.};
 
-  for (auto it1 = flock.begin(); it1 != std::prev(flock.end()); ++it1) {
-    if (it1 != it) {
-      v2_sum.x += it1->v.x;
-      v2_sum.y += it1->v.y;
+  for (auto it1 = neighbors.begin(); it1 != std::prev(neighbors.end()); ++it1) {
+    std::vector<coordinates>::iterator it1_ = *it1;
+    if (it1_ != it) {
+      v2_sum.x += it1_->v.x;
+      v2_sum.y += it1_->v.y;
     }
   }
 
@@ -42,10 +54,31 @@ auto alignment_velocity(Flock& flock, std::vector<coordinates>::iterator it,
   return v2;
 }
 
-auto coesion_velocity(Flock& flock, std::vector<coordinates>::iterator it,
-                      values const& val) {
-  velocity v3;
-  auto cm = flock.center_mass(val.n_boids);
+auto center_mass(
+    position cm, int const& n_boids,
+    std::vector<std::vector<coordinates>::iterator> const& neighbors) {
+  position sum{};
+
+  for (auto it = neighbors.begin(); it != std::prev(neighbors.end()); ++it) {
+    std::vector<coordinates>::iterator it_ = *it;
+
+    sum.x += it_->p.x;
+    sum.y += it_->p.y;
+  };
+
+  cm.x = sum.x / (n_boids - 1);
+  cm.y = sum.y / (n_boids - 1);
+
+  return cm;
+}
+
+auto coesion_velocity(
+    std::vector<std::vector<coordinates>::iterator> const& neighbors,
+    std::vector<coordinates>::iterator const it, values const& val) {
+  velocity v3{};
+  position cm{};
+
+  cm = center_mass(cm, val.n_boids, neighbors);
 
   v3.x = val.coesion_factor * (cm.x - it->p.x);
   v3.y = val.coesion_factor * (cm.y - it->p.y);
@@ -53,8 +86,9 @@ auto coesion_velocity(Flock& flock, std::vector<coordinates>::iterator it,
   return v3;
 }
 
-auto edge_velocity(std::vector<coordinates>::iterator it, values const& val) {
-  velocity edge;
+auto edge_velocity(std::vector<coordinates>::iterator const it,
+                   values const& val) {
+  velocity edge{};
 
   if ((it->p.x < val.edge_lenght && it->v.x < val.velocity_default) ||
       (it->p.x > (val.box_length - val.edge_lenght) &&
@@ -94,11 +128,13 @@ auto velocity_limit(velocity v_sum, values const& val) {
   return v_sum;
 }
 
-auto velocity_sum(velocity v_sum, Flock& flock,
-                  std::vector<coordinates>::iterator it, values const& val) {
-  auto v1 = serparation_velocity(flock, val);
-  auto v2 = alignment_velocity(flock, it, val);
-  auto v3 = coesion_velocity(flock, it, val);
+auto velocity_sum(
+    velocity v_sum,
+    std::vector<std::vector<coordinates>::iterator> const& neighbors,
+    std::vector<coordinates>::iterator const it, values const& val) {
+  auto v1 = serparation_velocity(neighbors, val);
+  auto v2 = alignment_velocity(neighbors, it, val);
+  auto v3 = coesion_velocity(neighbors, it, val);
   auto v4 = edge_velocity(it, val);
 
   v_sum.x += v1.x + v2.x + v3.x + v4.x + it->v.x;

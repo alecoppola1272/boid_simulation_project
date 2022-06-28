@@ -16,7 +16,7 @@ struct values {
 
   double const distance_neighbors{10.};
   double const distance_separation{3.};
-  double const boid_vision_angle{90.};
+  double const boid_vision_angle{30.};
 
   double const duration_second{20.0};
   int const fps{30};
@@ -40,12 +40,15 @@ int main() {
   //   throw std::runtime_error{"Separation factor must be < 1"};
   // } else {
   //   std::cout << "Edge factor: " << val.edge_factor
-  //             << "Distance of separation (preset): " << val.distance_separation
+  //             << "Distance of separation (preset): " <<
+  //             val.distance_separation
   //             << "\nSimulation duration (preset): " << val.duration_second
   //             << "\n\n";
 
-    simulation(val, val.duration_second, val.fps);
+  simulation(val, val.duration_second, val.fps);
   // }
 }
 
-// test, sfml, accumulate, vista boid, operator+/-/*/: in cooesion
+// test, sfml
+// iostream in main, controllo vicini,  vista boid
+// accumulate, operator@ coordinates

@@ -3,8 +3,6 @@
 
 #include <random>
 
-// operator+()
-
 struct position {
   double x;
   double y;
@@ -19,6 +17,7 @@ struct coordinates {
   position p;
   velocity v;
 };
+// operator@()
 
 class Flock {
   std::vector<coordinates> flock_;
@@ -46,9 +45,9 @@ class Flock {
     return flock_;
   }
 
-  auto center_mass(int n_boids) {
+  auto center_mass(int const& n_boids) {
     position cm{};
-    position sum{0., 0.};
+    position sum{};
 
     for (auto it = flock_.begin(); it != std::prev(flock_.end()); ++it) {
       sum.x += it->p.x;
@@ -61,9 +60,9 @@ class Flock {
     return cm;
   }
 
-  auto velocity_mean(int n_boids) {
+  auto velocity_mean(int const& n_boids) {
     velocity vm{};
-    velocity sum{0., 0.};
+    velocity sum{};
 
     for (auto it = flock_.begin(); it != std::prev(flock_.end()); ++it) {
       sum.x += it->v.x;
@@ -76,12 +75,13 @@ class Flock {
     return vm;
   }
 
-  auto dseparation_mean() {
+  auto d_separation_mean() {
     position dsm;
-    position sum{0., 0.};
-    int i;
+    position sum{};
+    int i{};
 
-    for (auto it1 = flock_.begin(); it1 != std::prev(std::prev(flock_.end())); ++it1) {
+    for (auto it1 = flock_.begin(); it1 != std::prev(std::prev(flock_.end()));
+         ++it1) {
       for (auto it2 = std::next(it1); it2 != std::prev(flock_.end()); ++it2) {
         sum.x += std::abs(it1->p.x - it2->p.x);
         sum.y += std::abs(it1->p.y - it2->p.y);
