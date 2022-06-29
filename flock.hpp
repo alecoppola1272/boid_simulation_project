@@ -25,7 +25,7 @@ class Flock {
  public:
   Flock(std::vector<coordinates> flock) : flock_{flock} {}
 
-  auto add_boids(values const& val) {
+  void add_boids(values const& val) {
     coordinates new_boid{};
 
     std::random_device rd;
@@ -42,7 +42,6 @@ class Flock {
 
       flock_.push_back(new_boid);
     }
-    return flock_;
   }
 
   auto center_mass(int const& n_boids) {

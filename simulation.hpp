@@ -9,24 +9,34 @@
 #include "flock.hpp"
 #include "velocity_rules.hpp"
 
+void dial_control(double const y, double const x, double& angle) {
+  if (y >= 0 && x < 0) {
+    angle = M_PI - angle;
+  } else if (y < 0 && x >= 0) {
+    angle += 2 * M_PI;
+  } else if (y < 0 && x < 0) {
+    angle = M_PI - angle;
+  }
+}
+
 void boid_vision(std::vector<coordinates>::iterator& it1,
                  std::vector<coordinates>::iterator& it2, values const& val,
                  std::vector<std::vector<coordinates>::iterator>& neighbors) {
-  double radius_direction = std::hypot(it1->v.x, it1->v.y);
-  double alpha =
-      std::asin(it1->v.y / radius_direction);  // prendere valore giusto dei due
-  if (alpha < 0) {
-    alpha += M_PI;
-  }
+  double ay = it1->v.y / std::hypot(it1->v.x, it1->v.y);
+  double ax = it1->v.x / std::hypot(it1->v.x, it1->v.y);
+  double by = (it2->p.y - it1->p.y) /
+              std::hypot(it1->p.x - it2->p.x, it1->p.y - it2->p.y);
+  double bx = (it2->p.x - it1->p.x) /
+              std::hypot(it1->p.x - it2->p.x, it1->p.y - it2->p.y);
+  // correggere b
 
-  double radius_distance_boid =
-      std::hypot(it1->p.x - it2->p.x, it1->p.y - it2->p.y);
-  double beta = std::asin((it2->p.y - it1->p.y) / radius_distance_boid);
-  if (beta < 0) {
-    beta += M_PI;
-  }
+  double alpha = std::asin(ay);
+  double beta = std::asin(by);
 
-  if (beta < (alpha + M_PI - (M_PI * val.boid_vision_angle / 180)) &&
+  dial_control(ay, ax, alpha);
+  dial_control(by, bx, beta);
+
+  if (beta < (alpha + M_PI - (M_PI * val.boid_vision_angle / 180)) ||
       beta > (alpha + M_PI + (M_PI * val.boid_vision_angle / 180))) {
     neighbors.push_back(it2);
   }
@@ -53,23 +63,36 @@ void update_velocity(Flock& flock, values const& val) {
   }
 }
 
-void update_position(Flock& flock, int const& fps) {
+void position_limit(std::vector<coordinates>::iterator& it, values const& val) {
+  if (it->p.x < 0) {
+    it->p.x = 0;
+  } else if (it->p.x > val.box_length) {
+    it->p.x = val.box_length;
+  }
+
+  if (it->p.y < 0) {
+    it->p.y = 0;
+  } else if (it->p.y > val.box_length) {
+    it->p.y = val.box_length;
+  }
+}
+
+void update_position(Flock& flock, values const& val) {
   for (auto it = flock.begin(); it != std::prev(flock.end()); ++it) {
-    it->p.x += it->v.x / fps;
-    it->p.y += it->v.y / fps;
+    it->p.x += it->v.x / val.fps;
+    it->p.y += it->v.y / val.fps;
+
+    position_limit(it, val);
   }
 }
 
 void update_flock(Flock& flock, values const& val) {
   update_velocity(flock, val);
-  update_position(flock, val.fps);
+  update_position(flock, val);
 }
 
 void simulation(values const& val) {
   Flock flock{{}};
-  position cm{};
-  velocity vm{};
-  position dsm{};
   double steps_tot = val.duration_second * val.fps;
 
   flock.add_boids(val);
@@ -83,11 +106,10 @@ void simulation(values const& val) {
   for (int steps = 0; steps != steps_tot; ++steps) {
     update_flock(flock, val);
 
-    cm = flock.center_mass(val.n_boids);
-    vm = flock.velocity_mean(val.n_boids);
-    dsm = flock.d_separation_mean();
-
     if ((steps + 1) % val.visual_steps == 0 || steps == 0) {
+      position cm = flock.center_mass(val.n_boids);
+      velocity vm = flock.velocity_mean(val.n_boids);
+      position dsm = flock.d_separation_mean();
       std::cout << std::fixed << std::setprecision(2) << std::setw(4)
                 << steps + 1 << " | " << std::setw(val.precision_output) << vm.x
                 << " | " << std::setw(val.precision_output) << vm.y << " | "
@@ -96,7 +118,7 @@ void simulation(values const& val) {
                 << std::setw(val.precision_output) << dsm.x << " | "
                 << std::setw(val.precision_output) << dsm.y << std::endl;
       // SFML
-      // cin e cout nel main
+      // iostream in main
     }
   }
   std::cout << "\n";

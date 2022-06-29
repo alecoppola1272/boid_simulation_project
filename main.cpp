@@ -50,5 +50,4 @@ int main() {
 }
 
 // test, sfml
-// iostream in main, controllo vicini,  vista boid
-// accumulate, operator@ coordinates
+// iostream in main, accumulate, operator@ coordinates
