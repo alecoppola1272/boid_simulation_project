@@ -3,8 +3,6 @@
 #define _USE_MATH_DEFINES
 
 #include <cmath>
-#include <iomanip>
-#include <iostream>
 
 #include "flock.hpp"
 #include "velocity_rules.hpp"
@@ -36,8 +34,8 @@ void boid_vision(std::vector<boid>::iterator& it1,
     beta += 2 * M_PI;
   }
 
-  if (beta < (alpha + M_PI - (M_PI * val.boid_vision_angle / 180)) ||
-      beta > (alpha + M_PI + (M_PI * val.boid_vision_angle / 180))) {
+  if (beta < (alpha + M_PI - (M_PI * val.boid_vision_angle / 360)) ||
+      beta > (alpha + M_PI + (M_PI * val.boid_vision_angle / 360))) {
     neighbors.push_back(it2);
   }
 }
@@ -58,7 +56,11 @@ void update_velocity(Flock& flock, values const& val) {
     std::vector<std::vector<boid>::iterator> neighbors;
     checking_neighbors(flock, it1, val, neighbors);
 
-    velocity_sum(neighbors, it1, val);
+    if (neighbors.empty() == 0) {
+      velocity_sum(neighbors, it1, val);
+    }
+
+    it1->v = it1->v + velocity_edge(it1, val);
     velocity_limit(it1, val);
   }
 }
@@ -88,39 +90,6 @@ void update_position(Flock& flock, values const& val) {
 void update_flock(Flock& flock, values const& val) {
   update_velocity(flock, val);
   update_position(flock, val);
-}
-
-void simulation(values const& val) {
-  Flock flock{{}};
-  double steps_tot = val.duration_second * val.fps;
-
-  flock.add_boids(val);
-
-  std::cout << "Step |    vm x |    vm y |    cm x |    cm y |   dsm "
-               "x |   dsm y"
-            << std::endl;
-  std::cout
-      << "---------------------------------------------------------------- "
-      << std::endl;
-  for (int steps = 0; steps != steps_tot; ++steps) {
-    update_flock(flock, val);
-
-    if ((steps + 1) % val.visual_steps == 0 || steps == 0) {
-      coordinates cm = flock.center_mass(val.n_boids);
-      coordinates vm = flock.velocity_mean(val.n_boids);
-      coordinates dsm = flock.d_separation_mean();
-      std::cout << std::fixed << std::setprecision(2) << std::setw(4)
-                << steps + 1 << " | " << std::setw(val.precision_output) << vm.x
-                << " | " << std::setw(val.precision_output) << vm.y << " | "
-                << std::setw(val.precision_output) << cm.x << " | "
-                << std::setw(val.precision_output) << cm.y << " | "
-                << std::setw(val.precision_output) << dsm.x << " | "
-                << std::setw(val.precision_output) << dsm.y << std::endl;
-      // SFML
-      // iostream in main
-    }
-  }
-  std::cout << "\n";
 }
 
 #endif

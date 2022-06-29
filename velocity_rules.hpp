@@ -4,16 +4,16 @@
 auto serparation_velocity(
     std::vector<std::vector<boid>::iterator> const& neighbors,
     std::vector<boid>::iterator const& it1, values const& val) {
-  coordinates v1_sum{};
+  coordinates p_sum{};
   for (auto it2 = neighbors.begin(); it2 != std::prev(neighbors.end()); ++it2) {
     std::vector<boid>::iterator it2_ = *it2;
     if (std::hypot(it1->p.x - it2_->p.x, it1->p.y - it2_->p.y) <=
         val.distance_separation) {
-      v1_sum = v1_sum + it2_->p - it1->p;
+      p_sum = p_sum + it2_->p - it1->p;
     }
   }
 
-  coordinates v1 = v1_sum * -val.separation_factor;
+  coordinates v1 = p_sum * -val.separation_factor;
   return v1;
 }
 
@@ -52,9 +52,8 @@ auto coesion_velocity(std::vector<std::vector<boid>::iterator> const& neighbors,
   return v3;
 }
 
-auto edge_velocity(std::vector<boid>::iterator const& it, values const& val) {
+auto velocity_edge(std::vector<boid>::iterator const& it, values const& val) {
   coordinates v_edge{};
-
   if ((it->p.x < val.edge_lenght && it->v.x < val.velocity_default) ||
       (it->p.x > (val.box_length - val.edge_lenght) &&
        it->v.x > -val.velocity_default)) {
@@ -95,7 +94,7 @@ void velocity_sum(std::vector<std::vector<boid>::iterator> const& neighbors,
                   std::vector<boid>::iterator const& it, values const& val) {
   it->v = it->v + serparation_velocity(neighbors, it, val) +
           alignment_velocity(neighbors, it, val) +
-          coesion_velocity(neighbors, it, val) + edge_velocity(it, val);
+          coesion_velocity(neighbors, it, val);
 }
 
 #endif

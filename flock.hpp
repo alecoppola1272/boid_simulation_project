@@ -50,6 +50,7 @@ class Flock {
     }
   }
 
+  // inutile per esame
   auto center_mass(int const& n_boids) {
     coordinates sum{};
     for (auto it = flock_.begin(); it != std::prev(flock_.end()); ++it) {
@@ -82,7 +83,7 @@ class Flock {
         ++i;
       }
     }
-    
+
     coordinates dsm = p_sum / i;
     return dsm;
   }
