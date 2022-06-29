@@ -28,13 +28,16 @@ void boid_vision(std::vector<coordinates>::iterator& it1,
               std::hypot(it1->p.x - it2->p.x, it1->p.y - it2->p.y);
   double bx = (it2->p.x - it1->p.x) /
               std::hypot(it1->p.x - it2->p.x, it1->p.y - it2->p.y);
-  // correggere b
 
   double alpha = std::asin(ay);
   double beta = std::asin(by);
 
   dial_control(ay, ax, alpha);
   dial_control(by, bx, beta);
+
+  if (alpha > beta) {
+    beta += 2 * M_PI;
+  }
 
   if (beta < (alpha + M_PI - (M_PI * val.boid_vision_angle / 180)) ||
       beta > (alpha + M_PI + (M_PI * val.boid_vision_angle / 180))) {
