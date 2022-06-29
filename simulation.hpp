@@ -19,21 +19,18 @@ void dial_control(double const y, double const x, double& angle) {
   }
 }
 
-void boid_vision(std::vector<coordinates>::iterator& it1,
-                 std::vector<coordinates>::iterator& it2, values const& val,
-                 std::vector<std::vector<coordinates>::iterator>& neighbors) {
-  double ay = it1->v.y / std::hypot(it1->v.x, it1->v.y);
-  double ax = it1->v.x / std::hypot(it1->v.x, it1->v.y);
-  double by = (it2->p.y - it1->p.y) /
-              std::hypot(it1->p.x - it2->p.x, it1->p.y - it2->p.y);
-  double bx = (it2->p.x - it1->p.x) /
-              std::hypot(it1->p.x - it2->p.x, it1->p.y - it2->p.y);
+void boid_vision(std::vector<boid>::iterator& it1,
+                 std::vector<boid>::iterator& it2, values const& val,
+                 std::vector<std::vector<boid>::iterator>& neighbors) {
+  coordinates a = it1->v / std::hypot(it1->v.x, it1->v.y);
+  coordinates b =
+      (it2->p - it1->p) / std::hypot(it1->p.x - it2->p.x, it1->p.y - it2->p.y);
 
-  double alpha = std::asin(ay);
-  double beta = std::asin(by);
+  double alpha = std::asin(a.y);
+  double beta = std::asin(b.y);
 
-  dial_control(ay, ax, alpha);
-  dial_control(by, bx, beta);
+  dial_control(a.y, a.x, alpha);
+  dial_control(b.y, b.x, beta);
 
   if (alpha > beta) {
     beta += 2 * M_PI;
@@ -45,9 +42,9 @@ void boid_vision(std::vector<coordinates>::iterator& it1,
   }
 }
 
-void checking_neighbors(
-    Flock& flock, std::vector<coordinates>::iterator& it1, values const& val,
-    std::vector<std::vector<coordinates>::iterator>& neighbors) {
+void checking_neighbors(Flock& flock, std::vector<boid>::iterator& it1,
+                        values const& val,
+                        std::vector<std::vector<boid>::iterator>& neighbors) {
   for (auto it2 = flock.begin(); it2 != std::prev(flock.end()); ++it2) {
     if (it2 != it1 && std::hypot(it1->p.x - it2->p.x, it1->p.y - it2->p.y) <=
                           val.distance_neighbors) {
@@ -58,7 +55,7 @@ void checking_neighbors(
 
 void update_velocity(Flock& flock, values const& val) {
   for (auto it1 = flock.begin(); it1 != std::prev(flock.end()); ++it1) {
-    std::vector<std::vector<coordinates>::iterator> neighbors;
+    std::vector<std::vector<boid>::iterator> neighbors;
     checking_neighbors(flock, it1, val, neighbors);
 
     velocity_sum(neighbors, it1, val);
@@ -66,7 +63,7 @@ void update_velocity(Flock& flock, values const& val) {
   }
 }
 
-void position_limit(std::vector<coordinates>::iterator& it, values const& val) {
+void position_limit(std::vector<boid>::iterator& it, values const& val) {
   if (it->p.x < 0) {
     it->p.x = 0;
   } else if (it->p.x > val.box_length) {
@@ -82,8 +79,7 @@ void position_limit(std::vector<coordinates>::iterator& it, values const& val) {
 
 void update_position(Flock& flock, values const& val) {
   for (auto it = flock.begin(); it != std::prev(flock.end()); ++it) {
-    it->p.x += it->v.x / val.fps;
-    it->p.y += it->v.y / val.fps;
+    it->p = it->p + (it->v / val.fps);
 
     position_limit(it, val);
   }
@@ -110,9 +106,9 @@ void simulation(values const& val) {
     update_flock(flock, val);
 
     if ((steps + 1) % val.visual_steps == 0 || steps == 0) {
-      position cm = flock.center_mass(val.n_boids);
-      velocity vm = flock.velocity_mean(val.n_boids);
-      position dsm = flock.d_separation_mean();
+      coordinates cm = flock.center_mass(val.n_boids);
+      coordinates vm = flock.velocity_mean(val.n_boids);
+      coordinates dsm = flock.d_separation_mean();
       std::cout << std::fixed << std::setprecision(2) << std::setw(4)
                 << steps + 1 << " | " << std::setw(val.precision_output) << vm.x
                 << " | " << std::setw(val.precision_output) << vm.y << " | "

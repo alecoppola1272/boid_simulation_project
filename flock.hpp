@@ -3,29 +3,37 @@
 
 #include <random>
 
-struct position {
-  double x;
-  double y;
-};
-
-struct velocity {
-  double x;
-  double y;
-};
-
 struct coordinates {
-  position p;
-  velocity v;
+  double x;
+  double y;
+};
+
+coordinates operator+(coordinates const& a, coordinates const& b) {
+  return coordinates{a.x + b.x, a.y + b.y};
+}
+coordinates operator-(coordinates const& a, coordinates const& b) {
+  return coordinates{a.x - b.x, a.y - b.y};
+}
+coordinates operator*(coordinates const& a, double const& b) {
+  return coordinates{a.x * b, a.y * b};
+}
+coordinates operator/(coordinates const& a, double const& b) {
+  return coordinates{a.x / b, a.y / b};
+}
+
+struct boid {
+  coordinates p;
+  coordinates v;
 };
 
 class Flock {
-  std::vector<coordinates> flock_;
+  std::vector<boid> flock_;
 
  public:
-  Flock(std::vector<coordinates> flock) : flock_{flock} {}
+  Flock(std::vector<boid> flock) : flock_{flock} {}
 
   void add_boids(values const& val) {
-    coordinates new_boid{};
+    boid new_boid{};
 
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -35,7 +43,6 @@ class Flock {
     for (int j = 0; j != val.n_boids; ++j) {
       new_boid.v.x = v_rand(gen);
       new_boid.v.y = v_rand(gen);
-
       new_boid.p.x = p_rand(gen);
       new_boid.p.y = p_rand(gen);
 
@@ -44,52 +51,39 @@ class Flock {
   }
 
   auto center_mass(int const& n_boids) {
-    position cm{};
-    position sum{};
-
+    coordinates sum{};
     for (auto it = flock_.begin(); it != std::prev(flock_.end()); ++it) {
-      sum.x += it->p.x;
-      sum.y += it->p.y;
+      sum = sum + it->p;
     };
 
-    cm.x = sum.x / (n_boids - 1);
-    cm.y = sum.y / (n_boids - 1);
-
+    coordinates cm = sum / (n_boids - 1);
     return cm;
   }
 
   auto velocity_mean(int const& n_boids) {
-    velocity vm{};
-    velocity sum{};
-
+    coordinates v_sum{};
     for (auto it = flock_.begin(); it != std::prev(flock_.end()); ++it) {
-      sum.x += it->v.x;
-      sum.y += it->v.y;
+      v_sum = v_sum + it->v;
     };
 
-    vm.x = sum.x / n_boids;
-    vm.y = sum.y / n_boids;
-
+    coordinates vm = v_sum / n_boids;
     return vm;
   }
 
   auto d_separation_mean() {
-    position dsm;
-    position sum{};
+    coordinates p_sum{};
     int i{};
 
     for (auto it1 = flock_.begin(); it1 != std::prev(std::prev(flock_.end()));
          ++it1) {
       for (auto it2 = std::next(it1); it2 != std::prev(flock_.end()); ++it2) {
-        sum.x += std::abs(it1->p.x - it2->p.x);
-        sum.y += std::abs(it1->p.y - it2->p.y);
+        p_sum.x += std::abs(it1->p.x - it2->p.x);
+        p_sum.y += std::abs(it1->p.y - it2->p.y);
         ++i;
       }
     }
-
-    dsm.x = sum.x / i;
-    dsm.y = sum.y / i;
-
+    
+    coordinates dsm = p_sum / i;
     return dsm;
   }
 
@@ -101,7 +95,7 @@ class Flock {
 
 /* sum = std::accumulate(flock_.begin(), flock_.end(), sum,
                       [](coordinates const& first, coordinates const& second) {
-                        position result;
+                        coordinates result;
                         result.x = first.p.x + second.p.x;
                         result.y = first.p.y + second.p.y;
                         return result;

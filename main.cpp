@@ -49,5 +49,4 @@ int main() {
   // }
 }
 
-// test, sfml
-// iostream in main, accumulate
+// test, sfml, iostream in main, accumulate
