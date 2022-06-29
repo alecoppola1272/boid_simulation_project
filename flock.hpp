@@ -17,7 +17,6 @@ struct coordinates {
   position p;
   velocity v;
 };
-// operator@()
 
 class Flock {
   std::vector<coordinates> flock_;

@@ -50,4 +50,4 @@ int main() {
 }
 
 // test, sfml
-// iostream in main, accumulate, operator@ coordinates
+// iostream in main, accumulate
