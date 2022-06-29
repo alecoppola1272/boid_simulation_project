@@ -1,6 +1,7 @@
 #ifndef SIMULATION_HPP
 #define SIMULATION_HPP
 
+#include <iomanip>
 #include <iostream>
 
 #include "flock.hpp"
@@ -10,11 +11,13 @@ auto update_velocity(Flock& flock, values const& val) {
   for (auto it1 = flock.begin(); it1 != std::prev(flock.end()); ++it1) {
     // std::vector<std::vector<coordinates>::iterator> neighbors;
     // for (auto it2 = flock.begin(); it2 != std::prev(flock.end()); ++it2) {
-    //   if (it2 != it1 && std::sqrt(std::pow(std::abs(it1->p.x - it2->p.x), 2.) +
+    //   if (it2 != it1 && std::sqrt(std::pow(std::abs(it1->p.x - it2->p.x), 2.)
+    //   +
     //                               (std::pow(std::abs(it1->p.y - it2->p.y),
-    //                                         2.))) <= val.distance_neighbors) {
+    //                                         2.))) <= val.distance_neighbors)
+    //                                         {
     //     // vista boid
-    //     neighbors.push_back(it1);  // iteratore o coordinates?
+    //     neighbors.push_back(it1);
     //   }
     // }
 
@@ -30,9 +33,7 @@ auto update_velocity(Flock& flock, values const& val) {
 }
 
 auto update_position(Flock& flock, int fps) {
-  auto it_last = std::prev(flock.end());
-
-  for (auto it = flock.begin(); it != it_last; ++it) {
+  for (auto it = flock.begin(); it != std::prev(flock.end()); ++it) {
     it->p.x += it->v.x / fps;
     it->p.y += it->v.y / fps;
   }
@@ -41,9 +42,10 @@ auto update_position(Flock& flock, int fps) {
 }
 
 auto update_flock(int fps, Flock& flock, values const& val) {
+
   flock = update_velocity(flock, val);
   flock = update_position(flock, fps);
-
+          
   return flock;
 }
 
@@ -56,26 +58,32 @@ void simulation(values const& val, double duration_second, int fps) {
 
   flock.add_boids(val);
 
-  std::cout << "Step\t|  vm x\t\t|  vm y\t\t|  cm x\t\t|  cm y\t\t|  dsm x\t|  "
-               "dsm y\n";
-  std::cout << "---------------------------------------------------------------"
-               "-----------------------------------";
+  std::cout << "Step |    vm x |    vm y |    cm x |    cm y |   dsm "
+               "x |   dsm y"
+            << std::endl;
+  std::cout
+      << "---------------------------------------------------------------- "
+      << std::endl;
   for (int steps = 0; steps != steps_tot; ++steps) {
     flock = update_flock(fps, flock, val);
 
     cm = flock.center_mass(val.n_boids);
     vm = flock.velocity_mean(val.n_boids);
-    dsm = flock.dseparation_mean(val.n_boids);
-    if ((steps + 1) % val.visual_steps == 0) {
-      std::cout << '\n'
-                << steps + 1 << "\t|  " << vm.x << "\t|  " << vm.y << "\t|  "
-                << cm.x << "\t|  " << cm.y << "\t|  " << dsm.x << "\t|  "
-                << dsm.y;
+    dsm = flock.dseparation_mean();
+
+    if ((steps + 1) % val.visual_steps == 0 || steps == 0) {
+      std::cout << std::fixed << std::setprecision(2) << std::setw(4)
+                << steps + 1 << " | " << std::setw(val.precision_output) << vm.x
+                << " | " << std::setw(val.precision_output) << vm.y << " | "
+                << std::setw(val.precision_output) << cm.x << " | "
+                << std::setw(val.precision_output) << cm.y << " | "
+                << std::setw(val.precision_output) << dsm.x << " | "
+                << std::setw(val.precision_output) << dsm.y << std::endl;
       // SFML
       // cin e cout nel main
     }
   }
-  std::cout << "\n\n";
+  std::cout << "\n";
 }
 
 #endif
