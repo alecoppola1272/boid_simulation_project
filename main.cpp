@@ -1,4 +1,3 @@
-#include <SFML/Graphics.hpp>
 #include <iomanip>
 #include <iostream>
 
@@ -62,7 +61,7 @@ void simulation(values const& val) {
 int main() {
   values val;
 
-  std::cout << "Number of boids: ";
+  std::cout << "Number of boids (n > 0): ";
   std::cin >> val.n_boids;
   std::cout << "Separation factor (s > 0): ";
   std::cin >> val.separation_factor;
@@ -71,7 +70,9 @@ int main() {
   std::cout << "Coesion factor (c > 0): ";
   std::cin >> val.coesion_factor;
 
-  if (val.n_boids <= 0 || val.separation_factor <= 0 ||
+  if (isdigit(val.n_boids) || isdigit(val.separation_factor) ||
+      isdigit(val.alignment_factor) || isdigit(val.coesion_factor) ||
+      val.n_boids <= 0 || val.separation_factor <= 0 ||
       val.alignment_factor >= 1 || val.alignment_factor <= 0 ||
       val.coesion_factor <= 0) {
     throw std::runtime_error{"Input error"};

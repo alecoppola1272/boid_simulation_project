@@ -84,13 +84,12 @@ class Flock {
       p_sum = p_sum + it->p;
     };
 
-    // coordinates start{};
+    // coordinates init{};
     // coordinates p_sum = std::accumulate(
-    //     flock_.begin(), flock_.end(), start,
-    //     [](boid first, boid second) { return first.p + second.p; });
+    //     flock_.begin(), flock_.end(), init,
+    //     // [](boid first, boid second)  { return first.p + second.p; });
     //     [](std::vector<boid>::iterator it1, std::vector<boid>::iterator it2) {
-    //       return it1->p + it2->p;
-    //     });
+    //       return it1->p + it2->p; });
 
     coordinates cm = p_sum / (n_boids - 1);
     return cm;
