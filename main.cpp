@@ -1,3 +1,4 @@
+#include <SFML/Graphics.hpp>
 #include <iomanip>
 #include <iostream>
 
@@ -25,7 +26,7 @@ struct values {
   int const fps{30};
 };
 
-#include "simulation.hpp"
+#include "evolve.hpp"
 
 void simulation(values const& val) {
   Flock flock{{}};
@@ -63,19 +64,22 @@ int main() {
 
   std::cout << "Number of boids: ";
   std::cin >> val.n_boids;
-  std::cout << "Separation factor: ";
+  std::cout << "Separation factor (s > 0): ";
   std::cin >> val.separation_factor;
-  std::cout << "Alignment factor (a < 1): ";
+  std::cout << "Alignment factor (0 < a < 1): ";
   std::cin >> val.alignment_factor;
-  std::cout << "Coesion factor: ";
+  std::cout << "Coesion factor (c > 0): ";
   std::cin >> val.coesion_factor;
 
-  if (val.alignment_factor >= 1) {
-    throw std::runtime_error{"Separation factor must be < 1"};
+  if (val.n_boids <= 0 || val.separation_factor <= 0 ||
+      val.alignment_factor >= 1 || val.alignment_factor <= 0 ||
+      val.coesion_factor <= 0) {
+    throw std::runtime_error{"Input error"};
   } else {
-    std::cout << "Edge factor: " << val.edge_factor
+    std::cout << "Edge factor (preset): " << val.edge_factor
               << "\nDistance of separation (preset): "
               << val.distance_separation
+              << "\nDistance of neighbors (preset): " << val.distance_neighbors
               << "\nSimulation duration (preset): " << val.duration_second
               << "\n\n";
 

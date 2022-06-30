@@ -1,5 +1,5 @@
-#ifndef SIMULATION_HPP
-#define SIMULATION_HPP
+#ifndef EVOLVE_HPP
+#define EVOLVE_HPP
 #define _USE_MATH_DEFINES
 
 #include <cmath>
