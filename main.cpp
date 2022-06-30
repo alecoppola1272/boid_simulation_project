@@ -9,7 +9,7 @@ struct values {
   double coesion_factor{};
 
   double const edge_factor{0.1};
-  int const box_length{100};
+  int const box_length{500};
   int const edge_lenght{10};
 
   int const visual_steps{10};
@@ -33,8 +33,8 @@ void simulation(values const& val) {
   flock.add_boids(val);
   double steps_tot = val.duration_second * val.fps;
 
-  std::cout << "Step |    vm x    vm y |    cm x    cm y |   dsm "
-               "x   dsm y"
+  std::cout << "Step |    vm x    vm y |   dsm "
+               "x   dsm y |    cm x    cm y"
             << std::endl;
   std::cout << "---------------------------------------------------------- "
             << std::endl;
@@ -49,10 +49,10 @@ void simulation(values const& val) {
       std::cout << std::fixed << std::setprecision(2) << std::setw(4)
                 << steps + 1 << " | " << std::setw(val.precision_output) << vm.x
                 << " " << std::setw(val.precision_output) << vm.y << " | "
-                << std::setw(val.precision_output) << cm.x << " "
-                << std::setw(val.precision_output) << cm.y << " | "
                 << std::setw(val.precision_output) << dsm.x << " "
-                << std::setw(val.precision_output) << dsm.y << std::endl;
+                << std::setw(val.precision_output) << dsm.y << " | "
+                << std::setw(val.precision_output) << cm.x << " "
+                << std::setw(val.precision_output) << cm.y << std::endl;
       // SFML
     }
   }
@@ -88,3 +88,4 @@ int main() {
 }
 
 // test, sfml, accumulate
+// 30 .1 .1 .1

@@ -1,6 +1,7 @@
 #ifndef FLOCK_HPP
 #define FLOCK_HPP
 
+#include <numeric>
 #include <random>
 
 struct coordinates {
@@ -33,13 +34,12 @@ class Flock {
   Flock(std::vector<boid> flock) : flock_{flock} {}
 
   void add_boids(values const& val) {
-    boid new_boid{};
-
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_real_distribution<> v_rand(1., val.velocity_default);
     std::uniform_real_distribution<> p_rand(1., val.box_length - 1);
 
+    boid new_boid{};
     for (int j = 0; j != val.n_boids; ++j) {
       new_boid.v.x = v_rand(gen);
       new_boid.v.y = v_rand(gen);
@@ -48,17 +48,6 @@ class Flock {
 
       flock_.push_back(new_boid);
     }
-  }
-
-  // inutile per esame
-  auto center_mass(int const& n_boids) {
-    coordinates sum{};
-    for (auto it = flock_.begin(); it != std::prev(flock_.end()); ++it) {
-      sum = sum + it->p;
-    };
-
-    coordinates cm = sum / (n_boids - 1);
-    return cm;
   }
 
   auto velocity_mean(int const& n_boids) {
@@ -88,16 +77,27 @@ class Flock {
     return dsm;
   }
 
+  // inutile per esame
+  auto center_mass(int const& n_boids) {
+    coordinates p_sum{};
+    for (auto it = flock_.begin(); it != std::prev(flock_.end()); ++it) {
+      p_sum = p_sum + it->p;
+    };
+
+    // coordinates start{};
+    // coordinates p_sum = std::accumulate(
+    //     flock_.begin(), flock_.end(), start,
+    //     [](boid first, boid second) { return first.p + second.p; });
+    //     [](std::vector<boid>::iterator it1, std::vector<boid>::iterator it2) {
+    //       return it1->p + it2->p;
+    //     });
+
+    coordinates cm = p_sum / (n_boids - 1);
+    return cm;
+  }
+
   auto begin() { return flock_.begin(); }
   auto end() { return flock_.end(); }
 };
 
 #endif
-
-/* sum = std::accumulate(flock_.begin(), flock_.end(), sum,
-                      [](coordinates const& first, coordinates const& second) {
-                        coordinates result;
-                        result.x = first.p.x + second.p.x;
-                        result.y = first.p.y + second.p.y;
-                        return result;
-                      }); */
