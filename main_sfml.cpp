@@ -2,6 +2,8 @@
 #include <iomanip>
 #include <iostream>
 
+#include "evolve.hpp"
+
 struct values {
   int n_boids{};
   double separation_factor{};
@@ -12,7 +14,7 @@ struct values {
   int const box_length{500};
   int const edge_lenght{10};
 
-  int const visual_steps{10};
+  int const visual_steps{50};
   int const precision_output{7};
 
   double const velocity_default{10.};
@@ -25,8 +27,6 @@ struct values {
   double const duration_second{20.0};
   int const fps{30};
 };
-
-#include "evolve.hpp"
 
 void simulation(values const& val) {
   Flock flock{{}};
@@ -43,8 +43,33 @@ void simulation(values const& val) {
   //     sf::Time elapsed = clock.restart();
   //   }
 
-  for (int steps = 0; steps != steps_tot; ++steps) {
-    update_flock(flock, val);
+  sf::RenderWindow window(sf::VideoMode(val.box_length, val.box_length),
+                          "Boids Simulation");
+  window.setFramerateLimit(val.fps);
+  sf::CircleShape circle(val.distance_separation);
+  circle.setFillColor(sf::Color::Yellow);
+
+  while (window.isOpen()) {
+    sf::Event event;
+    while (window.pollEvent(event)) {
+      if (event.type == sf::Event::Closed) {
+        window.close();
+      }
+    }
+
+    window.clear(sf::Color::White);
+
+    for (int steps = 0; steps != steps_tot; ++steps) {
+      update_flock(flock, val);
+
+      if ((steps + 1) % val.visual_steps == 0 || steps == 0) {
+        coordinates cm = flock.center_mass(val.n_boids);
+        coordinates vm = flock.velocity_mean(val.n_boids);
+        coordinates dsm = flock.d_separation_mean();
+        window.draw(circle);
+      }
+    }
+    window.display();
   }
 }
 
@@ -67,7 +92,7 @@ int main() {
       val.coesion_factor <= 0) {
     throw std::runtime_error{"Input error"};
   }
-  
+
   std::cout << "Edge factor (preset): " << val.edge_factor
             << "\nDistance of separation (preset): " << val.distance_separation
             << "\nDistance of neighbors (preset): " << val.distance_neighbors

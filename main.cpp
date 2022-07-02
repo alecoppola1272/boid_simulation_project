@@ -70,11 +70,10 @@ int main() {
   std::cout << "Coesion factor (c > 0): ";
   std::cin >> val.coesion_factor;
 
-  if (isdigit(val.n_boids) || isdigit(val.separation_factor) ||
-      isdigit(val.alignment_factor) || isdigit(val.coesion_factor) ||
-      val.n_boids <= 0 || val.separation_factor <= 0 ||
-      val.alignment_factor <= 0 || val.alignment_factor >= 1 ||
-      val.coesion_factor <= 0) {
+  if (isdigit(val.separation_factor) || isdigit(val.alignment_factor) ||
+      isdigit(val.coesion_factor) || val.n_boids <= 0 ||
+      val.separation_factor <= 0 || val.alignment_factor <= 0 ||
+      val.alignment_factor >= 1 || val.coesion_factor <= 0) {
     throw std::runtime_error{"Input error"};
   }
 
@@ -83,6 +82,11 @@ int main() {
             << "\nDistance of neighbors (preset): " << val.distance_neighbors
             << "\nSimulation duration (preset): " << val.duration_second
             << "\n\n";
+
+  std::cout << val.n_boids << "\n"
+            << val.separation_factor << "\n"
+            << val.alignment_factor << "\n"
+            << val.coesion_factor << "\n";
 
   simulation(val);
 }
