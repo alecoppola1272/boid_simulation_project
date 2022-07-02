@@ -1,3 +1,4 @@
+#include <SFML/Graphics.hpp>
 #include <iomanip>
 #include <iostream>
 
@@ -32,30 +33,19 @@ void simulation(values const& val) {
   flock.add_boids(val);
   double steps_tot = val.duration_second * val.fps;
 
-  std::cout << "Step |    vm x    vm y |   dsm "
-               "x   dsm y |    cm x    cm y"
-            << std::endl;
-  std::cout << "---------------------------------------------------------- "
-            << std::endl;
+  //   sf::RenderWindow window(sf::VideoMode(val.box_length, val.box_length),
+  //   "Flock simulation"); sf::Time time_duration =
+  //   sf::seconds(val.duration_second); sf::Clock clock; sf::Time t =
+  //   clock.restart();
+  //   //   sf::Time elapsed1 = clock.getElapsedTime();
+  //   //   std::cout << elapsed1.asSeconds() << std::endl;
+  //   while (window.isOpen()) {
+  //     sf::Time elapsed = clock.restart();
+  //   }
 
   for (int steps = 0; steps != steps_tot; ++steps) {
     update_flock(flock, val);
-
-    if ((steps + 1) % val.visual_steps == 0 || steps == 0) {
-      coordinates cm = flock.center_mass(val.n_boids);
-      coordinates vm = flock.velocity_mean(val.n_boids);
-      coordinates dsm = flock.d_separation_mean();
-      std::cout << std::fixed << std::setprecision(2) << std::setw(4)
-                << steps + 1 << " | " << std::setw(val.precision_output) << vm.x
-                << " " << std::setw(val.precision_output) << vm.y << " | "
-                << std::setw(val.precision_output) << dsm.x << " "
-                << std::setw(val.precision_output) << dsm.y << " | "
-                << std::setw(val.precision_output) << cm.x << " "
-                << std::setw(val.precision_output) << cm.y << std::endl;
-      // SFML
-    }
   }
-  std::cout << "\n";
 }
 
 int main() {
@@ -73,11 +63,11 @@ int main() {
   if (isdigit(val.n_boids) || isdigit(val.separation_factor) ||
       isdigit(val.alignment_factor) || isdigit(val.coesion_factor) ||
       val.n_boids <= 0 || val.separation_factor <= 0 ||
-      val.alignment_factor <= 0 || val.alignment_factor >= 1 ||
+      val.alignment_factor >= 1 || val.alignment_factor <= 0 ||
       val.coesion_factor <= 0) {
     throw std::runtime_error{"Input error"};
   }
-
+  
   std::cout << "Edge factor (preset): " << val.edge_factor
             << "\nDistance of separation (preset): " << val.distance_separation
             << "\nDistance of neighbors (preset): " << val.distance_neighbors
