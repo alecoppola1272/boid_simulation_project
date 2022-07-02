@@ -11,7 +11,7 @@ struct values {
   int const box_length{500};
   int const edge_lenght{10};
 
-  int const visual_steps{10};
+  int const visual_steps{50};
   int const precision_output{7};
 
   double const velocity_default{10.};
