@@ -71,5 +71,5 @@ int main() {
   simulation(val, sim);
 }
 
-// test, accumulate
+// test, accumulate, errore val_sim, v_rules in flock, sfml
 // 30 .1 .1 .1

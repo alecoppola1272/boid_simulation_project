@@ -2,7 +2,7 @@
 #include "doctest.h"
 #include "evolve.hpp"
 
-TEST_CASE("coordinates operator") {
+TEST_CASE("Coordinates operator") {
   coordinates a{2., 3.};
   coordinates b{4., 5.};
   double x{10};
@@ -285,30 +285,93 @@ TEST_CASE("Flock distance separation mean") {
 }
 
 TEST_CASE("Boid vision") {
+  SUBCASE("Boid in movimento") {
+    values val;
+
+    boid b1{1., 2., 1., 0.};
+    boid b2{3., 4., 0., 1.};
+    boid b3{5., 6., -1., 0.};
+    boid b4{7., 8., 0., -1.};
+    Flock f{{b1, b2, b3, b4}};
+
+    auto it1 = f.begin();
+    std::vector<std::vector<boid>::iterator> neighbors{};
+
+    for (auto it2 = std::next(f.begin()); it2 != f.end(); ++it2) {
+      boid_vision(it1, it2, val.boid_vision_angle, neighbors);
+    }
+
+    CHECK(neighbors.size() == 2);
+  }
+  SUBCASE("Boid fermo") {
+    values val;
+
+    boid b1{1., 2., 0., 0.};
+    boid b2{3., 4., 0., 1.};
+    boid b3{5., 6., -1., 0.};
+    boid b4{7., 8., 0., -1.};
+    Flock f{{b1, b2, b3, b4}};
+
+    auto it1 = f.begin();
+    std::vector<std::vector<boid>::iterator> neighbors{};
+
+    for (auto it2 = std::next(f.begin()); it2 != f.end(); ++it2) {
+      boid_vision(it1, it2, val.boid_vision_angle, neighbors);
+    }
+
+    CHECK(neighbors.size() == 3);
+  }
+}
+
+TEST_CASE("Checking neighbors") {
   values val;
 
   boid b1{1., 2., 1., 0.};
-  boid b2{3., 4., 0., 1.};
-  boid b3{5., 6., -1., 0.};
-  boid b4{7., 8., 0., -1.};
+  boid b2{3., 4., 1., 0.};
+  boid b3{5., 6., 1., 0.};
+  boid b4{7., 8., 1., 0.};
   Flock f{{b1, b2, b3, b4}};
 
   auto it1 = f.begin();
   std::vector<std::vector<boid>::iterator> neighbors{};
-
-  for (auto it2 = std::next(f.begin()); it2 != f.end(); ++it2) {
-    boid_vision(it1, it2, val.boid_vision_angle, neighbors);
-  }
+  checking_neighbors(f, it1, val, neighbors);
 
   CHECK(neighbors.size() == 2);
 }
 
-TEST_CASE("Checking neighbors") {}
+TEST_CASE("Position limit") {
+  values val;
+  boid b1{1., -2., 0., 0.};
+  Flock f{{b1}};
+  auto it = f.begin();
 
-TEST_CASE("Update velocity") {}
+  position_limit(it, val);
 
-TEST_CASE("Position limit") {}
+  CHECK(it->p.x == 1.);
+  CHECK(it->p.y == 0.);
+}
 
-TEST_CASE("Update position") {}
+TEST_CASE("Update position") {
+  values val;
+  val_simulation sim;
 
-TEST_CASE("Update Flock") {}
+  boid b1{1., 2., 1., 1.};
+  boid b2{3., 4., 2., 2.};
+  boid b3{5., 6., 3., 3.};
+  boid b4{70., 80., 4., 4.};
+  boid b5{110., 120., 5., 5.};
+  Flock f{{b1, b2, b3, b4, b5}};
+
+  update_position(f, val, sim);
+
+  CHECK(b1.p.x == 0.);
+  CHECK(b1.p.y == 0.);
+  CHECK(b2.p.x == 0.);
+  CHECK(b2.p.y == 0.);
+  CHECK(b3.p.x == 0.);
+  CHECK(b3.p.y == 0.);
+  CHECK(b4.p.x == 0.);
+  CHECK(b4.p.y == 0.);
+  CHECK(b5.p.x == 0.);
+  CHECK(b5.p.y == 0.);
+}

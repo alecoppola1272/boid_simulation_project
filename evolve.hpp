@@ -65,7 +65,7 @@ void checking_neighbors(Flock& flock, std::vector<boid>::iterator& it1,
 
 void update_velocity(Flock& flock, values const& val) {
   for (auto it1 = flock.begin(); it1 != flock.end(); ++it1) {
-    std::vector<std::vector<boid>::iterator> neighbors;
+    std::vector<std::vector<boid>::iterator> neighbors{};
     checking_neighbors(flock, it1, val, neighbors);
 
     if (neighbors.empty() == 0) {
