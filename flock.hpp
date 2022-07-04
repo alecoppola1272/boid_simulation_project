@@ -1,6 +1,28 @@
 #ifndef FLOCK_HPP
 #define FLOCK_HPP
 
+struct values {
+  // values input
+  int n_boids{};
+  double separation_factor{};
+  double alignment_factor{};
+  double coesion_factor{};
+
+  // values box
+  double const edge_factor{0.1};
+  int const box_length{500};
+  int const edge_lenght{10};
+
+  // values velocity
+  double const velocity_default{10.};
+  double const velocity_max{20.};
+
+  // values separation
+  double const distance_neighbors{10.};
+  double const distance_separation{2.};
+  double const boid_vision_angle{30.};
+};
+
 #include <numeric>
 #include <random>
 
@@ -52,7 +74,7 @@ class Flock {
 
   auto velocity_mean(int const& n_boids) {
     coordinates v_sum{};
-    for (auto it = flock_.begin(); it != std::prev(flock_.end()); ++it) {
+    for (auto it = flock_.begin(); it != flock_.end(); ++it) {
       v_sum = v_sum + it->v;
     };
 
@@ -64,9 +86,8 @@ class Flock {
     coordinates p_sum{};
     int i{};
 
-    for (auto it1 = flock_.begin(); it1 != std::prev(std::prev(flock_.end()));
-         ++it1) {
-      for (auto it2 = std::next(it1); it2 != std::prev(flock_.end()); ++it2) {
+    for (auto it1 = flock_.begin(); it1 != std::prev(flock_.end()); ++it1) {
+      for (auto it2 = std::next(it1); it2 != flock_.end(); ++it2) {
         p_sum.x += std::abs(it1->p.x - it2->p.x);
         p_sum.y += std::abs(it1->p.y - it2->p.y);
         ++i;
@@ -77,26 +98,15 @@ class Flock {
     return dsm;
   }
 
-  // inutile per esame
-  auto center_mass(int const& n_boids) {
-    coordinates p_sum{};
-    for (auto it = flock_.begin(); it != std::prev(flock_.end()); ++it) {
-      p_sum = p_sum + it->p;
-    };
-
-    // coordinates init{};
-    // coordinates p_sum = std::accumulate(
-    //     flock_.begin(), flock_.end(), init,
-    //     // [](boid first, boid second)  { return first.p + second.p; });
-    //     [](std::vector<boid>::iterator it1, std::vector<boid>::iterator it2) {
-    //       return it1->p + it2->p; });
-
-    coordinates cm = p_sum / (n_boids - 1);
-    return cm;
-  }
-
   auto begin() { return flock_.begin(); }
   auto end() { return flock_.end(); }
 };
 
 #endif
+
+// coordinates init{};
+// coordinates p_sum = std::accumulate(
+//     flock_.begin(), flock_.end(), init,
+//     // [](boid first, boid second)  { return first.p + second.p; });
+//     [](std::vector<boid>::iterator it1, std::vector<boid>::iterator it2) {
+//       return it1->p + it2->p; });
