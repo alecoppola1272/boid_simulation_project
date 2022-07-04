@@ -39,7 +39,7 @@ TEST_CASE("Struct") {
 TEST_CASE("Separation rule") {
   SUBCASE("Two boids") {
     values val;
-    val.separation_factor = 10;
+    val.separation_factor = 0.5;
 
     boid b1{0.1, 0.2, 0., 0.};
     boid b2{0.3, 0.4, 0., 0.};
@@ -51,13 +51,13 @@ TEST_CASE("Separation rule") {
 
     coordinates v1 = separation_velocity(neighbors, it1, val);
 
-    CHECK(v1.x == doctest::Approx(-4.));
-    CHECK(v1.y == doctest::Approx(-4.));
+    CHECK(v1.x == doctest::Approx(-0.1));
+    CHECK(v1.y == doctest::Approx(-0.1));
   }
 
   SUBCASE("Three boids") {
     values val;
-    val.separation_factor = 10;
+    val.separation_factor = 0.5;
 
     boid b1{0.1, 0.2, 0., 0.};
     boid b2{0.3, 0.4, 0., 0.};
@@ -71,8 +71,8 @@ TEST_CASE("Separation rule") {
 
     coordinates v1 = separation_velocity(neighbors, it1, val);
 
-    CHECK(v1.x == doctest::Approx(-7.));
-    CHECK(v1.y == doctest::Approx(-7.));
+    CHECK(v1.x == doctest::Approx(-0.3));
+    CHECK(v1.y == doctest::Approx(-0.3));
   }
 }
 
@@ -92,8 +92,8 @@ TEST_CASE("Alignment rule") {
 
     coordinates v2 = alignment_velocity(neighbors, it1, val);
 
-    CHECK(v2.x == 2.);
-    CHECK(v2.y == 2.);
+    CHECK(v2.x == doctest::Approx(1.));
+    CHECK(v2.y == doctest::Approx(1.));
   }
 
   SUBCASE("Three boids") {
@@ -113,8 +113,8 @@ TEST_CASE("Alignment rule") {
 
     coordinates v2 = alignment_velocity(neighbors, it1, val);
 
-    CHECK(v2.x == 1.25);
-    CHECK(v2.y == 1.5);
+    CHECK(v2.x == doctest::Approx(1.75));
+    CHECK(v2.y == doctest::Approx(2.));
   }
 }
 
@@ -134,8 +134,8 @@ TEST_CASE("Coesion rule") {
 
     coordinates v3 = coesion_velocity(neighbors, it1, val);
 
-    CHECK(v3.x == 1);
-    CHECK(v3.y == 1);
+    CHECK(v3.x == doctest::Approx(0.15));
+    CHECK(v3.y == doctest::Approx(0.2));
   }
 
   SUBCASE("Three Boids") {
@@ -155,15 +155,14 @@ TEST_CASE("Coesion rule") {
 
     coordinates v3 = coesion_velocity(neighbors, it1, val);
 
-    CHECK(v3.x == 1);
-    CHECK(v3.y == 1);
+    CHECK(v3.x == doctest::Approx(0.4));
+    CHECK(v3.y == doctest::Approx(0.5));
   }
 }
 
 TEST_CASE("Center Mass") {
   SUBCASE("Two boids") {
     values val;
-    val.coesion_factor = 0.5;
     val.n_boids = 2;
 
     boid b1{0.1, 0.2, 0., 0.};
@@ -174,15 +173,14 @@ TEST_CASE("Center Mass") {
     auto it2 = std::next(it1);
     std::vector<std::vector<boid>::iterator> const& neighbors{it1, it2};
 
-    coordinates v3 = coesion_velocity(neighbors, it1, val);
+    coordinates cm = center_mass(val.n_boids, neighbors);
 
-    CHECK(v3.x == 1);
-    CHECK(v3.y == 1);
+    CHECK(cm.x == doctest::Approx(0.4));
+    CHECK(cm.y == doctest::Approx(0.6));
   }
 
   SUBCASE("Three Boids") {
     values val;
-    val.coesion_factor = 0.5;
     val.n_boids = 2;
 
     boid b1{0.1, 0.2, 0., 0.};
@@ -195,33 +193,122 @@ TEST_CASE("Center Mass") {
     auto it3 = std::next(it2);
     std::vector<std::vector<boid>::iterator> const& neighbors{it1, it2, it3};
 
-    coordinates v3 = coesion_velocity(neighbors, it1, val);
+    coordinates cm = center_mass(val.n_boids, neighbors);
 
-    CHECK(v3.x == 1);
-    CHECK(v3.y == 1);
+    CHECK(cm.x == doctest::Approx(0.9));
+    CHECK(cm.y == doctest::Approx(1.2));
   }
-}  // n_boids, neighbors
+}
 
-TEST_CASE("Velocity limit"){}
+TEST_CASE("Velocity edge") {
+  SUBCASE("Boid lato sinistro verso fuori") {  // tradurre
+    values val;
+    boid b1{1, 2, -3, -4};
+    Flock f{{b1}};
+    auto it1 = f.begin();
+    coordinates v4 = velocity_edge(it1, val);
 
-TEST_CASE("Velocity sum"){}
+    CHECK(v4.x == doctest::Approx(54.));
+    CHECK(v4.y == doctest::Approx(64.));
+  }
 
-TEST_CASE("Flock add boid"){}
+  SUBCASE("Boid lato sinistro verso dentro") {  // tradurre
+    values val;
+    boid b1{1, 2, 3, 4};
+    Flock f{{b1}};
+    auto it1 = f.begin();
+    coordinates v4 = velocity_edge(it1, val);
 
-TEST_CASE("Flock velocity mean"){}
+    CHECK(v4.x == doctest::Approx(-54.));  // !
+    CHECK(v4.y == doctest::Approx(-64.));
+  }
+  SUBCASE("Boid lato destro verso fuori") {}   // tradurre
+  SUBCASE("Boid lato destro verso dentro") {}  // tradurre
+}
 
-TEST_CASE("Flock distance separation mean"){}
+TEST_CASE("Velocity limit") {
+  values val;
+  boid b1{0, 0, 100, -200};
+  Flock f{{b1}};
+  auto it1 = f.begin();
+  velocity_limit(it1, val);
 
-TEST_CASE("Dial control"){}
+  CHECK(it1->v.x == doctest::Approx(20));
+  CHECK(it1->v.y == doctest::Approx(-20));
+}
 
-TEST_CASE("Boid vision"){}
+TEST_CASE("Flock add boid") {
+  values val;
+  val.n_boids = 3;
 
-TEST_CASE("Checking neighbors"){}
+  Flock f{{}};
+  f.add_boids(val);
 
-TEST_CASE("Update velocity"){}
+  auto it1 = f.begin();
+  auto it2 = std::next(it1);
+  auto it3 = std::next(it2);
 
-TEST_CASE("Position limit"){}
+  CHECK(f.size() == 3);
+  CHECK(it1 != it2);
+  CHECK(it2 != it3);
+  CHECK(it3 != it1);
+}
 
-TEST_CASE("Update position"){}
+TEST_CASE("Flock velocity mean") {
+  values val;
+  val.n_boids = 3;
 
-TEST_CASE("Update Flock"){}
+  boid b1{0., 0., 1., 2.};
+  boid b2{0., 0., -3., -4.};
+  boid b3{0., 0., 5., 8.};
+  Flock f{{b1, b2, b3}};
+
+  coordinates vm = f.velocity_mean(val.n_boids);
+
+  CHECK(vm.x == doctest::Approx(1.));
+  CHECK(vm.y == doctest::Approx(2.));
+}
+
+TEST_CASE("Flock distance separation mean") {
+  values val;
+  val.n_boids = 3;
+
+  boid b1{1., 2., 0., 0.};
+  boid b2{3., 4., 0., 0.};
+  boid b3{5., 6., 0., 0.};
+  Flock f{{b1, b2, b3}};
+
+  coordinates dsm = f.d_separation_mean();
+
+  CHECK(dsm.x == doctest::Approx(2.6666666667));
+  CHECK(dsm.y == doctest::Approx(2.6666666667));
+}
+
+TEST_CASE("Boid vision") {
+  values val;
+
+  boid b1{1., 2., 1., 0.};
+  boid b2{3., 4., 0., 1.};
+  boid b3{5., 6., -1., 0.};
+  boid b4{7., 8., 0., -1.};
+  Flock f{{b1, b2, b3, b4}};
+
+  auto it1 = f.begin();
+  std::vector<std::vector<boid>::iterator> neighbors{};
+
+  for (auto it2 = std::next(f.begin()); it2 != f.end(); ++it2) {
+    boid_vision(it1, it2, val.boid_vision_angle, neighbors);
+  }
+
+  CHECK(neighbors.size() == 2);
+}
+
+TEST_CASE("Checking neighbors") {}
+
+TEST_CASE("Update velocity") {}
+
+TEST_CASE("Position limit") {}
+
+TEST_CASE("Update position") {}
+
+TEST_CASE("Update Flock") {}

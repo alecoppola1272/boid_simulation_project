@@ -9,7 +9,7 @@ struct values {
   double coesion_factor{};
 
   // values box
-  double const edge_factor{0.1};
+  double const edge_factor{2};
   int const box_length{500};
   int const edge_lenght{10};
 
@@ -90,6 +90,7 @@ class Flock {
       for (auto it2 = std::next(it1); it2 != flock_.end(); ++it2) {
         p_sum.x += std::abs(it1->p.x - it2->p.x);
         p_sum.y += std::abs(it1->p.y - it2->p.y);
+        // ipotenusa?
         ++i;
       }
     }
@@ -100,6 +101,7 @@ class Flock {
 
   auto begin() { return flock_.begin(); }
   auto end() { return flock_.end(); }
+  auto size() { return flock_.size(); }
 };
 
 #endif
