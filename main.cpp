@@ -2,25 +2,31 @@
 #include <iostream>
 
 struct values {
+  // values input
   int n_boids{};
   double separation_factor{};
   double alignment_factor{};
   double coesion_factor{};
 
+  // values box
   double const edge_factor{0.1};
   int const box_length{500};
   int const edge_lenght{10};
 
-  int const visual_steps{50};
-  int const precision_output{7};
-
+  // values velocity
   double const velocity_default{10.};
   double const velocity_max{20.};
 
+  // values separation
   double const distance_neighbors{10.};
   double const distance_separation{2.};
   double const boid_vision_angle{30.};
 
+  // values output
+  int const visual_steps{50};
+  int const precision_output{7};
+
+  // values simulation
   double const duration_second{20.0};
   int const fps{30};
 };
@@ -52,7 +58,6 @@ void simulation(values const& val) {
                 << std::setw(val.precision_output) << dsm.y << " | "
                 << std::setw(val.precision_output) << cm.x << " "
                 << std::setw(val.precision_output) << cm.y << std::endl;
-      // SFML
     }
   }
   std::cout << "\n";
@@ -91,5 +96,5 @@ int main() {
   simulation(val);
 }
 
-// test, sfml, accumulate
+// test, accumulate
 // 30 .1 .1 .1
