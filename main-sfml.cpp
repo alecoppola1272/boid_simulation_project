@@ -61,5 +61,3 @@ int main() {
     simulation(val);
   }
 }
-
-// test, sfml, accumulate

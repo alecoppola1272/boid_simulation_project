@@ -3,9 +3,33 @@
 
 #include <random>
 
+struct values {
+  int n_boids{};
+  double separation_factor{};
+  double alignment_factor{};
+  double coesion_factor{};
+
+  double const edge_factor{0.1};
+  int const box_length{100};
+  int const edge_lenght{10};
+
+  int const visual_steps{10};
+  int const precision_output{7};
+
+  double const velocity_default{10.};
+  double const velocity_max{20.};
+
+  double const distance_neighbors{10.};
+  double const distance_separation{2.};
+  double const boid_vision_angle{30.};
+
+  double const duration_second{20.0};
+  int const fps{30};
+};
+
 struct coordinates {
-  double x;
-  double y;
+  double x{};
+  double y{};
 };
 
 coordinates operator+(coordinates const& a, coordinates const& b) {
@@ -22,8 +46,8 @@ coordinates operator/(coordinates const& a, double const& b) {
 }
 
 struct boid {
-  coordinates p;
-  coordinates v;
+  coordinates p{};
+  coordinates v{};
 };
 
 class Flock {
