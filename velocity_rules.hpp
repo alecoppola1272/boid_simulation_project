@@ -1,7 +1,7 @@
 #ifndef VELOCITY_RULES_HPP
 #define VELOCITY_RULES_HPP
 
-auto serparation_velocity(
+auto separation_velocity(
     std::vector<std::vector<boid>::iterator> const& neighbors,
     std::vector<boid>::iterator const& it1, values const& val) {
   coordinates p_sum{};

@@ -1,37 +1,47 @@
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
-#include "simulation.hpp"
-
 #include "doctest.h"
+#include "evolve.hpp"
 
-// TEST_CASE("Mass Center") {
-//   SUBCASE("Two Boids") {
-//     boid b1{0., 0., 2., 3.};
-//     boid b2{0., 0., 3., 5.};
-//     flock f{{b1, b2}, 3.};
-//     flock::CM cm = f.mass_center();
+TEST_CASE("operator+") {
+  coordinates a{2., 3.};
+  coordinates b{4., 5.};
 
-//     CHECK(cm.x_cm == (5.));
-//     CHECK(cm.y_cm == (8.));
-//   }
-  
-//   SUBCASE("Three Boids") {
-//     boid b1{0., 0., 2., 3.};
-//     boid b2{0., 0., 3., 5.};
-//     boid b3{0., 0., 7., 2.};
-//     flock f{{b1, b2, b3}, 3.};
-//     flock::CM cm = f.mass_center();
-//     CHECK(cm.x_cm == (6.));
-//     CHECK(cm.y_cm == (5.));
-//   }
-// }
+  coordinates c = a + b;
 
-// TEST_CASE("Separation Rule") {
-//   SUBCASE("Two Boids") {
-//     boid b1{2., 3., 2., 3.};
-//     boid b2{1., 2., 3., 5.};
-//     flock f{{b1, b2}, 3.};
-//     flock::separation_v v1 = f.separation();
-//     CHECK(v1.vx_1 == (-0.5));
-//     CHECK(v1.vy_1 == (-1.));
-//   }
-// }
+  CHECK(c.x == 6);
+  CHECK(c.y == 8);
+}
+
+TEST_CASE("Struct") {
+  boid b{
+      1.,
+      2.,
+      3.,
+      4.,
+  };
+
+  CHECK(b.p.x == 1.);
+  CHECK(b.p.y == 2.);
+  CHECK(b.v.x == 3.);
+  CHECK(b.v.y == 4.);
+}
+
+TEST_CASE("Separation rule") {
+  SUBCASE("Two Boids") {
+    values val;
+    val.separation_factor = 0.3;
+
+    boid b1{0., 0., 0., 0.};
+    boid b2{0.2, 0.1, 0., 0.};
+    Flock f{{b1, b2}};
+
+    auto it1 = f.begin();
+    auto it2 = std::next(it1);
+    std::vector<std::vector<boid>::iterator> const& neighbors{it1, it2};
+
+    coordinates v1 = separation_velocity(neighbors, it1, val);
+
+    CHECK(v1.x == (-0.6));
+    CHECK(v1.y == (-0.6));
+  }
+}

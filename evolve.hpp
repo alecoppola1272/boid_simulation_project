@@ -4,6 +4,13 @@
 
 #include <cmath>
 
+struct val_simulation {
+  int const visual_steps{50};
+  int const precision_output{7};
+  double const duration_second{20.0};
+  int const fps{30};
+};
+
 #include "flock.hpp"
 #include "velocity_rules.hpp"
 
@@ -87,7 +94,7 @@ void update_position(Flock& flock, values const& val) {
   }
 }
 
-void update_flock(Flock& flock, values const& val) {
+void update_flock(Flock& flock, values const& val, val_simulation const& sim) {
   update_velocity(flock, val);
   update_position(flock, val);
 }
