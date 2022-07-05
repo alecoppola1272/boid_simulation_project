@@ -2,42 +2,18 @@
 #include <iomanip>
 #include <iostream>
 
-#include "evolve.hpp"
-
-struct values {
-  // values input
-  int n_boids{};
-  double separation_factor{};
-  double alignment_factor{};
-  double coesion_factor{};
-
-  // values box
-  double const edge_factor{0.1};
-  int const box_length{500};
-  int const edge_lenght{10};
-
-  // values velocity
-  double const velocity_default{10.};
-  double const velocity_max{20.};
-
-  // values separation
-  double const distance_neighbors{10.};
-  double const distance_separation{2.};
-  double const boid_vision_angle{30.};
-
-  // values output
+struct val_simulation {
   int const visual_steps{50};
-  int const precision_output{7};
-
-  // values simulation
   double const duration_second{20.0};
   int const fps{30};
 };
 
-void simulation(values const& val) {
+#include "evolve.hpp"
+
+void simulation(values const& val, val_simulation const& sim) {
   Flock flock{{}};
   flock.add_boids(val);
-  double steps_tot = val.duration_second * val.fps;
+  double steps_tot = sim.duration_second * sim.fps;
 
   //   sf::RenderWindow window(sf::VideoMode(val.box_length, val.box_length),
   //   "Flock simulation"); sf::Time time_duration =
@@ -51,7 +27,7 @@ void simulation(values const& val) {
 
   sf::RenderWindow window(sf::VideoMode(val.box_length, val.box_length),
                           "Boids Simulation");
-  window.setFramerateLimit(val.fps);
+  window.setFramerateLimit(sim.fps);
   sf::CircleShape circle(val.distance_separation);
   circle.setFillColor(sf::Color::Yellow);
 
@@ -66,14 +42,8 @@ void simulation(values const& val) {
     window.clear(sf::Color::White);
 
     for (int steps = 0; steps != steps_tot; ++steps) {
-      update_flock(flock, val);
-
-      if ((steps + 1) % val.visual_steps == 0 || steps == 0) {
-        coordinates cm = flock.center_mass(val.n_boids);
-        coordinates vm = flock.velocity_mean(val.n_boids);
-        coordinates dsm = flock.d_separation_mean();
-        window.draw(circle);
-      }
+      update_flock(flock, val, sim);
+      window.draw(circle);
     }
     window.display();
   }
@@ -81,6 +51,7 @@ void simulation(values const& val) {
 
 int main() {
   values val;
+  val_simulation sim;
 
   std::cout << "Number of boids (n > 0): ";
   std::cin >> val.n_boids;
@@ -102,10 +73,10 @@ int main() {
   std::cout << "Edge factor (preset): " << val.edge_factor
             << "\nDistance of separation (preset): " << val.distance_separation
             << "\nDistance of neighbors (preset): " << val.distance_neighbors
-            << "\nSimulation duration (preset): " << val.duration_second
+            << "\nSimulation duration (preset): " << sim.duration_second
             << "\n\n";
 
-  simulation(val);
+  simulation(val, sim);
 }
 
 // test, sfml, accumulate
