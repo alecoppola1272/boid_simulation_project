@@ -1,107 +1,79 @@
 #ifndef EVOLVE_HPP
 #define EVOLVE_HPP
 #define _USE_MATH_DEFINES
-struct val_simulation {
-  int const visual_steps{50};
-  int const precision_output{7};
-  double const duration_second{20.0};
-  int const fps{30};
-};
 
 #include <cmath>
 
-#include "flock.hpp"
 #include "velocity_rules.hpp"
 
-void dial_control(double const y, double const x, double& angle) {
-  if (y >= 0 && x < 0) {
-    angle = M_PI - angle;
+inline float dial_control(float const y, float const x, float angle) {
+  if ((y >= 0 && x < 0) || (y < 0 && x < 0)) {
+    angle -= M_PI;
   } else if (y < 0 && x >= 0) {
     angle += 2 * M_PI;
-  } else if (y < 0 && x < 0) {
-    angle = M_PI - angle;
   }
+  return angle;
 }
 
-void boid_vision(std::vector<boid>::iterator& it1,
-                 std::vector<boid>::iterator& it2,
-                 double const& boid_vision_angle,
-                 std::vector<std::vector<boid>::iterator>& neighbors) {
-  if (it1->v.x != 0 && it1->v.y != 0) {
-    coordinates a = it1->v / std::hypot(it1->v.x, it1->v.y);
-    coordinates b = (it2->p - it1->p) /
-                    std::hypot(it1->p.x - it2->p.x, it1->p.y - it2->p.y);
+inline bool boid_vision(boid& b1, boid& b2, float const& boid_blind_angle) {
+  bool check{1};
+  if (b1.v.x != 0 || b1.v.y != 0) {
+    coordinates a = b1.v / std::hypot(b1.v.x, b1.v.y);
+    coordinates b =
+        (b2.p - b1.p) / std::hypot(b1.p.x - b2.p.x, b1.p.y - b2.p.y);
 
-    double alpha = std::asin(a.y);
-    double beta = std::asin(b.y);
-
-    dial_control(a.y, a.x, alpha);
-    dial_control(b.y, b.x, beta);
+    float alpha = dial_control(a.y, a.x, std::asin(a.y));
+    float beta = dial_control(b.y, b.x, std::asin(b.y));
 
     if (alpha > beta) {
       beta += 2 * M_PI;
     }
+    if (beta > (alpha + M_PI - (M_PI * boid_blind_angle / 360)) &&
+        beta < (alpha + M_PI + (M_PI * boid_blind_angle / 360))) {
+      check = 0;
+    }
+  }
+  return check;
+}
 
-    if (beta < (alpha + M_PI - (M_PI * boid_vision_angle / 360)) ||
-        beta > (alpha + M_PI + (M_PI * boid_vision_angle / 360))) {
+inline auto checking_neighbors(
+    Flock& flock, std::vector<boid>::iterator& it1,
+    values const& val) {
+  std::vector<std::vector<boid>::iterator> neighbors{};
+  auto fbegin = flock.begin();
+  auto fend = flock.end();
+  for (auto it2 = fbegin; it2 != fend; ++it2) {
+    if (it2 != it1 &&
+        std::hypot(it1->p.x - it2->p.x, it1->p.y - it2->p.y) <=
+            val.distance_neighbors &&
+        boid_vision(*it1, *it2, val.boid_blind_angle)) {
       neighbors.push_back(it2);
     }
-  } else {
-    neighbors.push_back(it2);
   }
+  return neighbors;
 }
 
-void checking_neighbors(Flock& flock, std::vector<boid>::iterator& it1,
-                        values const& val,
-                        std::vector<std::vector<boid>::iterator>& neighbors) {
-  for (auto it2 = flock.begin(); it2 != flock.end(); ++it2) {
-    if (it2 != it1 && std::hypot(it1->p.x - it2->p.x, it1->p.y - it2->p.y) <=
-                          val.distance_neighbors) {
-      boid_vision(it1, it2, val.boid_vision_angle, neighbors);
-    }
-  }
-}
-
-void update_velocity(Flock& flock, values const& val) {
-  for (auto it1 = flock.begin(); it1 != flock.end(); ++it1) {
-    std::vector<std::vector<boid>::iterator> neighbors{};
-    checking_neighbors(flock, it1, val, neighbors);
+inline void update_velocity(Flock& flock, values const& val) {
+  auto fbegin = flock.begin();
+  auto fend = flock.end();
+  for (auto it1 = fbegin; it1 != fend; ++it1) {
+    auto neighbors = checking_neighbors(flock, it1, val);
 
     if (neighbors.empty() == 0) {
-      velocity_sum(neighbors, it1, val);
+      it1->v += velocity_rules_sum(neighbors, *it1, val);
     }
-
-    it1->v = it1->v + velocity_edge(it1, val);
-    velocity_limit(it1, val);
+    it1->v += velocity_edge(*it1, val);
+    it1->v *= val.velocity_balancer;
+    it1->v = velocity_limit(it1->v, val);
   }
 }
 
-void position_limit(std::vector<boid>::iterator& it, values const& val) {
-  if (it->p.x < 0) {
-    it->p.x = 0;
-  } else if (it->p.x > val.box_length) {
-    it->p.x = val.box_length;
+inline void update_position(Flock& flock, int const& fps) {
+  auto fbegin = flock.begin();
+  auto fend = flock.end();
+  for (auto it = fbegin; it != fend; ++it) {
+    it->p += (it->v / fps);
   }
-
-  if (it->p.y < 0) {
-    it->p.y = 0;
-  } else if (it->p.y > val.box_length) {
-    it->p.y = val.box_length;
-  }
-}
-
-void update_position(Flock& flock, values const& val,
-                     val_simulation const& sim) {
-  for (auto it = flock.begin(); it != flock.end(); ++it) {
-    it->p = it->p + (it->v / sim.fps);
-
-    position_limit(it, val);
-  }
-}
-
-void update_flock(Flock& flock, values const& val, val_simulation const& sim) {
-  update_velocity(flock, val);
-  update_position(flock, val, sim);
 }
 
 #endif
